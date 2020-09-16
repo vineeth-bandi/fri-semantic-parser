@@ -9,9 +9,8 @@ private:
     std::vector<ParseNode *> children_;
     std::vector<int> semantic_form_;
     std::vector<int> surface_form_;
-    ParseNode::ParseNode(ParseNode *parent, ParseNode *node, std::vector<ParseNode *> children = {}, std::vector<int> surface_form= {}, std::vector<int> semantic_form = {}) : parent_(parent), node_(node), children_(children), surface_form_(surface_form), semantic_form_(surface_form)
+    ParseNode::ParseNode(ParseNode *parent, ParseNode *node, std::vector<ParseNode *> children = {}, std::vector<int> surface_form = {}, std::vector<int> semantic_form = {}) : parent_(parent), node_(node), children_(children), surface_form_(surface_form), semantic_form_(surface_form)
     {
-    
     }
     std::vector<ParseNode *> get_leaves()
     {
