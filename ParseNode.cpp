@@ -7,13 +7,13 @@ ParseNode::ParseNode(ParseNode *parent, ParseNode *node, std::vector<ParseNode *
 }
 
 std::vector<ParseNode *> ParseNode::get_leaves() {
+    std::vector<ParseNode *> leaves;
     if (this->children_.size() != 0) {
-        std::vector<ParseNode *> leaves = this->children_[0]->get_leaves();
+        leaves = this->children_[0]->get_leaves();
         std::vector<ParseNode *> leaves2 = this->children_[1]->get_leaves();
         leaves.insert(leaves.end(), leaves2.begin(), leaves2.end());
         return leaves;
     }
-    std::vector<ParseNode *> leaves;
     leaves.push_back(this);
     return leaves;
 }
