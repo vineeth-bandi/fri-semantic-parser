@@ -1,0 +1,209 @@
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d1abb/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d1abb.dir/build.make CMakeFiles/cmTC_d1abb.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d1abb.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_d1abb.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_d1abb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1abb.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_d1abb.dir/testCCompiler.c.o  -o cmTC_d1abb 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_d1abb.dir/build.make:97: recipe for target 'cmTC_d1abb' failed
+make[1]: *** [cmTC_d1abb] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_d1abb/fast' failed
+make: *** [cmTC_d1abb/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_8eb0d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_8eb0d.dir/build.make CMakeFiles/cmTC_8eb0d.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8eb0d.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_8eb0d.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_8eb0d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8eb0d.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_8eb0d.dir/testCCompiler.c.o  -o cmTC_8eb0d 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_8eb0d.dir/build.make:97: recipe for target 'cmTC_8eb0d' failed
+make[1]: *** [cmTC_8eb0d] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_8eb0d/fast' failed
+make: *** [cmTC_8eb0d/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a3462/fast"
+/usr/bin/make -f CMakeFiles/cmTC_a3462.dir/build.make CMakeFiles/cmTC_a3462.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a3462.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_a3462.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_a3462
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a3462.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_a3462.dir/testCCompiler.c.o  -o cmTC_a3462 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_a3462.dir/build.make:97: recipe for target 'cmTC_a3462' failed
+make[1]: *** [cmTC_a3462] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_a3462/fast' failed
+make: *** [cmTC_a3462/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c8361/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c8361.dir/build.make CMakeFiles/cmTC_c8361.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c8361.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_c8361.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_c8361
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c8361.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_c8361.dir/testCCompiler.c.o  -o cmTC_c8361 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_c8361.dir/build.make:97: recipe for target 'cmTC_c8361' failed
+make[1]: *** [cmTC_c8361] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_c8361/fast' failed
+make: *** [cmTC_c8361/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_66d9d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_66d9d.dir/build.make CMakeFiles/cmTC_66d9d.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_66d9d.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_66d9d.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_66d9d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66d9d.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_66d9d.dir/testCCompiler.c.o  -o cmTC_66d9d 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_66d9d.dir/build.make:97: recipe for target 'cmTC_66d9d' failed
+make[1]: *** [cmTC_66d9d] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_66d9d/fast' failed
+make: *** [cmTC_66d9d/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_8e777/fast"
+/usr/bin/make -f CMakeFiles/cmTC_8e777.dir/build.make CMakeFiles/cmTC_8e777.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8e777.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_8e777.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_8e777
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8e777.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_8e777.dir/testCCompiler.c.o  -o cmTC_8e777 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_8e777.dir/build.make:97: recipe for target 'cmTC_8e777' failed
+make[1]: *** [cmTC_8e777] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_8e777/fast' failed
+make: *** [cmTC_8e777/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e67f9/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e67f9.dir/build.make CMakeFiles/cmTC_e67f9.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e67f9.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_e67f9.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_e67f9
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e67f9.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_e67f9.dir/testCCompiler.c.o  -o cmTC_e67f9 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_e67f9.dir/build.make:97: recipe for target 'cmTC_e67f9' failed
+make[1]: *** [cmTC_e67f9] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_e67f9/fast' failed
+make: *** [cmTC_e67f9/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_b7997/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b7997.dir/build.make CMakeFiles/cmTC_b7997.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b7997.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_b7997.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_b7997
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b7997.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_b7997.dir/testCCompiler.c.o  -o cmTC_b7997 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_b7997.dir/build.make:97: recipe for target 'cmTC_b7997' failed
+make[1]: *** [cmTC_b7997] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_b7997/fast' failed
+make: *** [cmTC_b7997/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_47ea5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_47ea5.dir/build.make CMakeFiles/cmTC_47ea5.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_47ea5.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_47ea5.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_47ea5
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_47ea5.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_47ea5.dir/testCCompiler.c.o  -o cmTC_47ea5 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_47ea5.dir/build.make:97: recipe for target 'cmTC_47ea5' failed
+make[1]: *** [cmTC_47ea5] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_47ea5/fast' failed
+make: *** [cmTC_47ea5/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_91084/fast"
+/usr/bin/make -f CMakeFiles/cmTC_91084.dir/build.make CMakeFiles/cmTC_91084.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_91084.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_91084.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_91084
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_91084.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_91084.dir/testCCompiler.c.o  -o cmTC_91084 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_91084.dir/build.make:97: recipe for target 'cmTC_91084' failed
+make[1]: *** [cmTC_91084] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_91084/fast' failed
+make: *** [cmTC_91084/fast] Error 2
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ab48a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ab48a.dir/build.make CMakeFiles/cmTC_ab48a.dir/build
+make[1]: Entering directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ab48a.dir/testCCompiler.c.o
+/mnt/c/MinGW/bin/gcc.exe    -o CMakeFiles/cmTC_ab48a.dir/testCCompiler.c.o   -c /home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_ab48a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ab48a.dir/link.txt --verbose=1
+/mnt/c/MinGW/bin/gcc.exe      -rdynamic CMakeFiles/cmTC_ab48a.dir/testCCompiler.c.o  -o cmTC_ab48a 
+gcc.exe: error: unrecognized command line option '-rdynamic'
+CMakeFiles/cmTC_ab48a.dir/build.make:97: recipe for target 'cmTC_ab48a' failed
+make[1]: *** [cmTC_ab48a] Error 1
+make[1]: Leaving directory '/home/maharaja/fri-semantic-parser/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_ab48a/fast' failed
+make: *** [cmTC_ab48a/fast] Error 2
+
+

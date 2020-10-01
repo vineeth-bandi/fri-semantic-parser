@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/maharaja/fri-semantic-parser/Ontology.cpp
+Ontology.h
+/home/maharaja/fri-semantic-parser/Ontology.h
+
+/home/maharaja/fri-semantic-parser/Ontology.h
+string.h
+-
+iostream
+-
+vector
+-
+boost/variant.hpp
+-
+iostream
+-
+fstream
+-
+algorithm
+-
+bits/stdc++.h
+-
+
+/home/maharaja/fri-semantic-parser/ParseNode.cpp
+ParseNode.h
+/home/maharaja/fri-semantic-parser/ParseNode.h
+
+/home/maharaja/fri-semantic-parser/ParseNode.h
+iostream
+-
+vector
+-
+
+/home/maharaja/fri-semantic-parser/main.cpp
+ParseNode.h
+/home/maharaja/fri-semantic-parser/ParseNode.h
+Ontology.h
+/home/maharaja/fri-semantic-parser/Ontology.h
+

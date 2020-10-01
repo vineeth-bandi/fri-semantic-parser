@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/parsing.dir/main.cpp.o CMakeFiles/parsing.dir/Ontology.cpp.o CMakeFiles/parsing.dir/ParseNode.cpp.o  -o parsing 

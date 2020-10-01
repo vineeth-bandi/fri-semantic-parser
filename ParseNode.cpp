@@ -1,5 +1,4 @@
-#include <iostream>
-#include <vector>
+
 #include "ParseNode.h"
 
 ParseNode::ParseNode(ParseNode *parent, ParseNode *node, std::vector<ParseNode *> children, std::vector<int> surface_form, std::vector<int> semantic_form) : parent_(parent), node_(node), children_(children), surface_form_(surface_form), semantic_form_(surface_form) {

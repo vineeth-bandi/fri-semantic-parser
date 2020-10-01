@@ -1,0 +1,3 @@
+/home/maharaja/fri-semantic-parser/CMakeFiles/rebuild_cache.dir
+/home/maharaja/fri-semantic-parser/CMakeFiles/main.dir
+/home/maharaja/fri-semantic-parser/CMakeFiles/edit_cache.dir
