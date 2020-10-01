@@ -9,5 +9,6 @@ int main(int argc, char **argv){
     x.children_.push_back(&z);
     std::vector<ParseNode *> temp = x.get_leaves();
     std::cout << temp[0] << " " << temp[1] << std::endl;
+    Ontology ont("ont.txt");
     return 0;
 }

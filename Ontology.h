@@ -15,12 +15,12 @@ class Ontology
 {
 public:
     Ontology(std::string ont_fname);
-    virtual void read_sem_fromfile(std::string fname) = 0;
-    virtual int calc_num_pred_args(int idx) = 0;
-    virtual int read_type_from_str(std::string s, bool allow_wild = false) = 0;
-    virtual std::string compose_str_from_type(int t) = 0;
-    virtual bool types_equal(int tidx, int tjdx) = 0;
-    virtual int find_index(typesBoost x) = 0;
+    void read_sem_fromfile(std::string fname);
+    int calc_num_pred_args(int idx);
+    int read_type_from_str(std::string s, bool allow_wild = false);
+    std::string compose_str_from_type(int t);
+    bool types_equal(int tidx, int tjdx);
+    int find_index(typesBoost x);
     std::vector<std::string> preds_;
     std::vector<int> entries_;
     std::vector<typesBoost> types_;

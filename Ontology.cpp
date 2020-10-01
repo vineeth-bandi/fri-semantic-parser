@@ -27,7 +27,11 @@ void Ontology::read_sem_fromfile(std::string fname)
     {
         std::size_t start = line.find_first_not_of(WHITESPACE);
         std::size_t end = line.find_last_not_of(WHITESPACE);
-        line = line.substr(start, end - start + 1);
+
+        if(start == std::string::npos  || end  == std::string::npos)
+            continue;
+
+        line = line.substr(start, end - start + 1 > 0 ? end - start + 1 : 0);
         if (line.length() == 0 || line[0] == '#')
             continue;
         std::string intermediate;
@@ -36,11 +40,10 @@ void Ontology::read_sem_fromfile(std::string fname)
         std::string name = intermediate;
         std::getline(token_stream, intermediate, ':');
         std::string type_str = intermediate;
-        typesBoost nameBoosted = name;
-        int index = find_index(nameBoosted);
-        if (index != -1)
+        auto loc = std::find(preds_.begin(), preds_.end(), name);
+        if (loc != preds_.end())
         {
-            std::cout << "Multiple predicates";
+            std::cout << "Multiple predicates" << std::endl;
             exit(0);
         }
         entries_.push_back(Ontology::read_type_from_str(type_str));
@@ -66,8 +69,10 @@ int Ontology::read_type_from_str(std::string s, bool allow_wild)
         std::vector<int> comp_type;
         std::string s1;
         std::string s2;
+
         s1 = s.substr(1, split_idx - 1);
         s2 = s.substr(split_idx + 1, s.size() - split_idx - 2);
+
         comp_type.push_back(Ontology::read_type_from_str(s1, allow_wild));
         comp_type.push_back(Ontology::read_type_from_str(s2, allow_wild));
         typesBoost comp_type_converted = comp_type;
