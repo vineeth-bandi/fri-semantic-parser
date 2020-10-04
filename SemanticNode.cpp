@@ -1,4 +1,1 @@
-class SemanticNode
-{
-
-};
+#include "SemanticNode.h"
