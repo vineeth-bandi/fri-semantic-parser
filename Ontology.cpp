@@ -127,11 +127,11 @@ bool Ontology::types_equal(int tidx, int tjdx)
 }
 int Ontology::find_index(typesBoost x)
 {
-    auto it = std::find(types_.begin(), types_.end(), x);
-    if (it == types_.end())
-        return -1;
-    int index = std::distance(types_.begin(), it);
-    return index;
+    int c = 0;
+    for(auto it = types_.begin(); it != types_.end(); ++it, c++)
+        if(x == *it)
+            return c;
+    return -1;
 }
 
 Ontology::Ontology(std::string ont_fname)
