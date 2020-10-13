@@ -55,12 +55,12 @@ void Lexicon::compute_pred_to_surface(std::map<int, vector<int>> pts){
                 if(!curr.is_lambda){
                     // C++20 now has map.contains().
                     // find might be incorrect for a map (first part of if statement)
-                    if(pts.contains(curr.idx) && !(std::find(pts[curr.idx].begin(), pts[curr.idx].end(), sur_idx) != pts[curr.idx].end())){
-                        pts[curr.idx].push_back(sur_idx);
-                    } else if (!pts.contains(curr.idx)) {
+                    if(pts.contains(curr.idx_) && !(std::find(pts[curr.idx_].begin(), pts[curr.idx_].end(), sur_idx) != pts[curr.idx_].end())){
+                        pts[curr.idx_].push_back(sur_idx);
+                    } else if (!pts.contains(curr.idx_)) {
                         vector<int> sur_idx_vec;
                         sur_idx_vec.push_back(sur_idx);
-                        pts[curr.idx] = sur_idx_vec;
+                        pts[curr.idx_] = sur_idx_vec;
                     }
                 }
                 if (curr.children != NULL) {
@@ -105,7 +105,7 @@ vector<vector<int>> Lexicon::compute_reverse_entries(){
 
 int Lexicon::calc_exp_args(int idx){
     int exp_args = 0;
-    int curr_cat = semantic_forms[idx].category;
+    int curr_cat = semantic_forms[idx].category_;
     while (categories[curr_cat].type() == typeid(std::vector<int>)) {
         exp_args += 1;
         curr_cat = categories[curr_cat][0];
@@ -114,7 +114,7 @@ int Lexicon::calc_exp_args(int idx){
 }
 
 int Lexicon::calc_return_cat(int idx){
-    int curr_cat = semantic_forms[idx].category;
+    int curr_cat = semantic_forms[idx].category_;
     while (categories[curr_cat].type() == typeid(std::vector<int>)) {
         curr_cat = categories[curr_cat][0];
     }
@@ -127,7 +127,7 @@ vector<int> Lexicon::find_consumables_for_cat(int idx) {
     std::vector<vector<int>> consumables;
     for (SemanticNode* sem_form : semantic_forms) {
         //boost
-        boost::variant<std::string, std::vector<int>> curr = categories[sem_form.category];
+        boost::variant<std::string, std::vector<int>> curr = categories[sem_form.category_];
         // while type(curr) is list and type(self.categories[curr[0]]):  what is second part of while loop
         while (curr.type() == typeid(std::vector<int>) && categories[curr[0]].type()) {
             if (curr[0] == idx) {
@@ -275,7 +275,7 @@ int Lexicon::read_category_from_str(std::string s){
 
 
 // new param bool? 
-SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, vector<std::string> scoped_lambdas, bool allow_expanding_ont){
+SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, vector<std::string> scoped_lambdas){
 
 }
 
@@ -285,7 +285,7 @@ void Lexicon::delete_semantic_form_for_surface_form(SemanticNode *surface_form, 
     }
     SemanticNode *matching_semantic_form = NULL;
     for (SemanticNode *semantic_form : semantic_forms) {
-        if (semantic_form.idx == ont_idx) {
+        if (semantic_form.idx_ == ont_idx) {
             matching_semantic_form = semantic_form;
             break;
         }
