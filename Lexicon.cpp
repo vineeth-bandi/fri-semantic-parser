@@ -4,6 +4,7 @@ Lexicon::Lexicon(Ontology* ontology, , bool expanding_ont){
 	this.ontology = ontology;
 	this.allow_expanding_ont = expanding_ont;
 	generator_should_flush = false;
+
 	// read lex from files, line 11,
 	// update support structures, do in constructor
 
@@ -30,14 +31,21 @@ Lexicon::Lexicon(Ontology* ontology, , bool expanding_ont){
 void Lexicon::update_support_structures() {
     compute_pred_to_surface(pred_to_surface);
     reverse_entries = compute_reverse_entries();
-    for(int i = 0; i < semantic_forms.size(); i++) sem_form_expected_args = calc_exp_args(i);
-    for(int i = 0; i < semantic_forms.size(); i++) sem_form_return_cat = calc_return_cat(i);
-    for(int i = 0; i < categories.size(); i++) category_consumes = find_consumables_for_cat(i);
+    for(int i = 0; i < semantic_forms.size(); i++) {
+        sem_form_expected_args.push_back(calc_exp_args(i));
+    }
+
+    for(int i = 0; i < semantic_forms.size(); i++) {
+        sem_form_return_cat.push_back(calc_return_cat(i));
+    } 
+    for(int i = 0; i < categories.size(); i++) {
+        category_consumes.push_back(find_consumables_for_cat(i));
+    } 
     generator_should_flush = true;
 }
 
 // pts is a dictionary (pred to surface), each contain vector of ints (sur_idxs) std::map<int, vector<int>>
-void Lexicon::compute_pred_to_surface(vector<int> pts){
+void Lexicon::compute_pred_to_surface(std::map<int, vector<int>> pts){
     for (int sur_idx = 0; i < entries.size(); i++) {
         for(int sem_idx : entries[sur_idx]) {
             vector<SemanticNode *> to_examine;
@@ -63,7 +71,7 @@ void Lexicon::compute_pred_to_surface(vector<int> pts){
     }
 }
 
-vector<int> Lexicon::compute_reverse_entries(){
+vector<vector<int>> Lexicon::compute_reverse_entries(){
     std::map<int, vector<int>> r; 
     for (int sur_idx = 0; i < surface_forms.size(); i++) {
         for (int sem_idx : entries[sur_idx]) {
@@ -114,12 +122,12 @@ int Lexicon::calc_return_cat(int idx){
 }
 
 // check return type
-vector<std::vector<boost::variant<vector<int>, std::string>>> Lexicon::find_consumables_for_cat(int idx) {
+vector<int> Lexicon::find_consumables_for_cat(int idx) {
     // list of list of int or just string
-    vector<std::vector<boost::variant<vector<int>, std::string>>> consumables;
+    std::vector<vector<int>> consumables;
     for (SemanticNode* sem_form : semantic_forms) {
         //boost
-        std::vector<boost::variant<vector<int>, std::string>> curr = categories[sem_form.category];
+        boost::variant<std::string, std::vector<int>> curr = categories[sem_form.category];
         // while type(curr) is list and type(self.categories[curr[0]]):  what is second part of while loop
         while (curr.type() == typeid(std::vector<int>) && categories[curr[0]].type()) {
             if (curr[0] == idx) {
@@ -128,7 +136,7 @@ vector<std::vector<boost::variant<vector<int>, std::string>>> Lexicon::find_cons
             curr = categories[curr[0]];
         } 
         if (curr[0] == idx) {
-            std::vector<boost::variant<vector<int>, std::string>> cons;
+            vector<int> cons;
             cons.push_back(curr[1]);
             cons.push_back(curr[2]);
             // check this "if cons not in consumables:"
@@ -141,7 +149,7 @@ vector<std::vector<boost::variant<vector<int>, std::string>>> Lexicon::find_cons
 }
 
 // c in self categories?
-int Lexicon::get_or_add_category(std::vector<boost::variant<vector<int>, std::string>> c){
+int Lexicon::get_or_add_category(boost::variant<vector<int>, std::string> c){
     if (!(std::find(categories.begin(), categories.end(), c) != categories.end())) {
         auto it = find(categories.begin(), categories.end(), c); 
         // If element was found 
@@ -180,9 +188,9 @@ string Lexicon::compose_str_from_category(int idx){
 }
 
 // find return type
-vector<> Lexicon::get_semantic_forms_for_surface_form(vector<SemanticNode *> surface_form){
+vector<int> Lexicon::get_semantic_forms_for_surface_form(vector<SemanticNode *> surface_form){
     if (!(std::find(surface_forms.begin(), surface_forms.end(), surface_form) != surface_forms.end())) {
-        return vector<> empty_vec;
+        return vector<int> empty_vec;
     } else {
         int index = 0;
         auto it = find(surface_forms.begin(), surface_forms.end(), surface_form); 

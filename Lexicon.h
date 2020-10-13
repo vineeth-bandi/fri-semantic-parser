@@ -10,27 +10,26 @@ using namespace std;
 class Lexicon{
 
 public:
-	Lexicon(Ontology ontology, , bool expanding_ont)
+	Lexicon(Ontology ontology, string lexicon_fname, word_embeddings_fn)
     Ontology* ontology;
     vector<boost::variant<std::string, std::vector<int>>> categories;
-    // still figure out what the lists contain
-    std::vector<> entries;
-    std::vector<> pred_to_surface;
-    std::vector<> surface_forms;
-    std::vector<> semantic_forms;
-    std::vector<> reverse_entries;
-    std::vector<> sem_form_expected_args;
-    std::vector<> sem_form_return_cat;
-    std::vector<> category_consumes;
+    std::vector<vector<int>> entries;
+    std::map<int, vector<int>> pred_to_surface;
+    std::vector<std::string> surface_forms;
+    std::vector<SemanticNode *> semantic_forms;
+    std::vector<vector<int>> reverse_entries;
+    std::vector<int> sem_form_expected_args;
+    std::vector<int> sem_form_return_cat;
+    std::vector<vector<vector<int>>> category_consumes;
     bool generator_should_flush;
     bool sem_form_expected;
-    bool allow_expanding_ont;
-	void compute_pred_to_surface(vector<int> pts);
-	vector<int> compute_reverse_entries();
+	void update_support_structures();
+	void compute_pred_to_surface(std::map<int, vector<int>>);
+	vector<vector<int>> compute_reverse_entries()
 	int calc_exp_args(int idx);
 	int calc_return_cat(int idx);
-	int get_or_add_category(int c);
-	// two diff returns, can be a str or int
+	vector<int> find_consumables_for_cat(int idx) 
+	int get_or_add_category(boost::variant<vector<int>, std::string> c);
 	string compose_str_from_category(int idx);
 	vector<> get_semantic_forms_for_surface_form(vector<> surface_form);
 	vector<> get_surface_forms_for_predicate(vector<> pred);
