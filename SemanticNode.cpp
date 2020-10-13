@@ -6,9 +6,9 @@ SemanticNode::SemanticNode(SemanticNode *parent, int type, int category, int idx
    is_lambda_instantiation_ = false;
    categories_used_.push_back(idx_);
 }
-SemanticNode::SemanticNode(SemanticNode *parent, int type, int category, bool is_lambda, int lambda_name, bool is_lambda_instantiation, std::vector<SemanticNode *> children) : parent_(parent), type_(type), category_(category), is_lambda_(is_lambda), lambda_name_(lambda_name), is_lambda_instantiation_(is_lambda_instantiation), children_(children)
+SemanticNode::SemanticNode(SemanticNode *parent, int type, int category, int lambda_name, bool is_lambda_instantiation, std::vector<SemanticNode *> children) : parent_(parent), type_(type), category_(category), lambda_name_(lambda_name), is_lambda_instantiation_(is_lambda_instantiation), children_(children)
 {
-   
+   is_lambda_ = true;
 }
 
 void SemanticNode::set_category(int idx){
@@ -51,16 +51,59 @@ void SemanticNode::set_return_type(Ontology &ontology){
    }
 }
 
-void SemanticNode::copy_attributes(SemanticNode &a, std::vector<int> &lambda_map, bool preserve_parent, bool preserve_children, int lambda_enumeration){
+void SemanticNode::copy_attributes(SemanticNode &a, std::vector<int> *lambda_map, bool preserve_parent, bool preserve_children, int lambda_enumeration){
    set_category(a.category_);
    type_ = a.type_;
    is_lambda_ = a.is_lambda_;
    idx_ = a.idx_;
    lambda_name_ = a.lambda_name_ + lambda_enumeration;
-   if(!preserve_parent)
+   if(lambda_map != NULL){
+      if(std::find(lambda_map->begin(), lambda_map->end(), lambda_name_) != lambda_map->end()){
+         lambda_name_ = (*lambda_map)[a.lambda_name_];
+      }
+   }
+   is_lambda_instantiation_ = a.is_lambda_instantiation_;
+   if(!preserve_parent){
       parent_ = a.parent_;
+   }
    if(!preserve_children){
-      
+      std::vector<SemanticNode*> temp();
+         for(int i = 0; i < a.children_.size(); i++){
+            SemanticNode child(this, 0, 0, 0, std::vector<SemanticNode *>());
+            child.copy_attributes(*a.children_[i], lambda_map =lambda_map, preserve_children = true, lambda_enumeration=lambda_enumeration);
+         }
    }
    return_type_ = a.return_type_;
 }
+
+std::string SemanticNode::print_little(){
+   std::string s = "(";
+   if(is_lambda_)
+      s += std::to_string(is_lambda_) + ',' + std::to_string(type_) + ',' + std::to_string(lambda_name_);
+   else
+      s += std::to_string(idx_);
+   s += ")";
+   return s;
+}
+
+void SemanticNode::renumerate_lambdas(std::vector<int> lambdas){
+   if(is_lambda_){
+      if(is_lambda_instantiation_){
+         lambdas.push_back(lambda_name_);
+         lambda_name_ = lambdas.size();
+      }
+      else
+      {
+         auto it = std::find(lambdas.begin(), lambdas.end(), lambda_name_);
+         lambda_name_ = std::distance(lambdas.begin(), it) + 1;
+      }
+   }
+   if(children_.size() != 0){
+      for(SemanticNode* c : children_)
+         c->renumerate_lambdas(lambdas);
+   }
+}
+
+
+
+
