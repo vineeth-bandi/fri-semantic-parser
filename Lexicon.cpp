@@ -2,19 +2,64 @@
 
 Lexicon::Lexicon(Ontology* ontology, std::string lexicon_fname, std::string word_embeddings_fn){
 	this.ontology = ontology;
-    surface_forms = 
-    semantic_forms = ;
-    entries = ;
-    pred_to_surface = ;
+    // surface_forms = 
+    // semantic_forms = ;
+    // entries = ;
+    // pred_to_surface = ;
     read_lex_from_file(lexicon_fname);
-    reverse_entries = ;
-    neighbor_surface_forms = ;
+    // reverse_entries = ;
+    // neighbor_surface_forms = ;
     //sem_form_expected_args = NULL;
     //sem_form_return_cat = NULL;
     //category_consumes = NULL;
     generator_should_flush = false;
     update_support_structures();
     wv = load_word_embeddings(word_embeddings_fn);
+}
+// custom methods: readfile and strip
+bool readFile(std::string fileName, std::vector<std::string>&fileVec){
+    std::ifstream in(fileName.c_str());
+    if (!in){
+        return false;
+    }
+    std::string line;
+    while (std::getLine(in, line)){
+        if (line.size() > 0){
+            fileVec.push_back(line);
+        }
+    }
+    in.close();
+    return true;
+}
+
+// not sure, no c equivalent for python strip, change to std::string?
+char *strip(char *s) {
+    size_t size;
+    char *end;
+    size = strlen(s);
+    if (!size)
+        return s;
+    end = s + size - 1;
+    while (end >= s && isspace(*end))
+        end--;
+    *(end + 1) = '\0';
+    while (*s && isspace(*s))
+        s++;
+    return s;
+}
+
+// rewrite split to be vector not just lhs
+std::vector<std::string> split(std::string in, std::string delimiter){
+    std::string input = in;
+    std::vector<std::string> lhs;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = input.find(delimiter)) != std::string::npos) {
+        token = input.substr(0, pos);
+        lhs.push_back(token);
+        input.erase(0, pos + delimiter.length());
+    }
+    return lhs;
 }
 
 Type load_word_embeddings(std::string fn) {
@@ -242,51 +287,6 @@ vector<int> Lexicon::get_surface_forms_for_predicate(boost::variant<std::string,
     return std::vector<int>();
 }
 
-// custom methods: readfile and strip
-bool readFile(std::string fileName, std::vector<std::string>&fileVec){
-    std::ifstream in(fileName.c_str());
-    if (!in){
-        return false;
-    }
-    std::string line;
-    while (std::getLine(in, line)){
-        if (line.size() > 0){
-            fileVec.push_back(line);
-        }
-    }
-    in.close();
-    return true;
-}
-
-// not sure, no c equivalent for python strip, change to std::string?
-char *strip(char *s) {
-    size_t size;
-    char *end;
-    size = strlen(s);
-    if (!size)
-        return s;
-    end = s + size - 1;
-    while (end >= s && isspace(*end))
-        end--;
-    *(end + 1) = '\0';
-    while (*s && isspace(*s))
-        s++;
-    return s;
-}
-
-// rewrite split to be vector not just lhs
-std::vector<std::string> split(std::string in, std::string delimiter){
-    std::string input = in;
-    std::vector<std::string> lhs;
-    size_t pos = 0;
-    std::string token;
-    while ((pos = input.find(delimiter)) != std::string::npos) {
-        token = input.substr(0, pos);
-        lhs.push_back(token);
-        input.erase(0, pos + delimiter.length());
-    }
-    return lhs;
-}
 
 // three diff returns
 void Lexicon::read_lex_from_file(std::string fname){

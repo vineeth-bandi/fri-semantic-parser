@@ -11,7 +11,7 @@
 class Lexicon{
 
 public:
-	Lexicon(Ontology ontology, std::string lexicon_fname, word_embeddings_fn);
+	Lexicon(Ontology ontology, std::string lexicon_fname, std::stringword_embeddings_fn);
     Ontology* ontology;
     vector<boost::variant<std::string, std::vector<int>>> categories;
     std::vector<std::vector<int>> entries;
@@ -25,6 +25,7 @@ public:
     std::vector<std::vector<std::vector<int>>> category_consumes;
     bool generator_should_flush;
     bool sem_form_expected;
+
 	std::vector<> get_lexicon_word_embedding_neighbors(w, int n)
 	void update_support_structures();
 	void compute_pred_to_surface(std::map<int, std::vector<int>>);
