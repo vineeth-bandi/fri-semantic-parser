@@ -2,6 +2,7 @@
 #define CYKPARSER_H
 #include "Ontology.h"
 #include "Lexicon.h"
+#include "SemanticNode.h"
 #include "ParseNode.h"
 #include <unordered_map>
 
@@ -20,8 +21,8 @@ typedef boost::variant<std::string, ParseNode, std::vector<std::vector<lex_entri
 class Parameters
 {
 public:
-    Ontology ont;
-    Lexicon lex;
+    Ontology ont_;
+    Lexicon lex_;
     std::unordered_map<tuple2, int> _token_given_token_counts;
     std::unordered_map<tuple2, int> _CCG_given_token_counts;
     std::unordered_map<tuple3, int> _CCG_production_counts;
@@ -38,6 +39,7 @@ public:
     std::unordered_map<tuple3, double> semantic;
     std::unordered_map<int, double> skipwords_given_surface_form;
 
+    Parameters(Ontology ont, Lexicon lex, bool allow_merge, bool use_language_model = false, double lexicon_weight = 1.0);
     void update_probabilities();
     std::unordered_map<int, double> init_skipwords_given_surface_form(double lexicon_weight);
     std::unordered_map<tuple2, double> init_ccg_given_token(double lexicon_weight);
