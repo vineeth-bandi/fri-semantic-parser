@@ -1,6 +1,6 @@
 #include "Lexicon.h"
 
-Lexicon::Lexicon(Ontology* ontology, std::string lexicon_fname, bool expanding_ont){
+Lexicon::Lexicon(Ontology* ontology, std::string lexicon_fname, std::string word_embeddings_fn){
 	this.ontology = ontology;
     surface_forms = 
     semantic_forms = ;
@@ -17,7 +17,7 @@ Lexicon::Lexicon(Ontology* ontology, std::string lexicon_fname, bool expanding_o
     wv = load_word_embeddings(word_embeddings_fn);
 }
 
-Type load_word_embeddings(fn) {
+Type load_word_embeddings(std::string fn) {
     // Type wvb = NULL;
     if (fn != NULL) {
         // need c++ equivalent for split
@@ -258,7 +258,7 @@ bool readFile(std::string fileName, std::vector<std::string>&fileVec){
     return true;
 }
 
-// not sure, no c equivalent for python split
+// not sure, no c equivalent for python strip, change to std::string?
 char *strip(char *s) {
     size_t size;
     char *end;
@@ -274,6 +274,7 @@ char *strip(char *s) {
     return s;
 }
 
+// rewrite split to be vector not just lhs
 std::vector<std::string> split(std::string in, std::string delimiter){
     std::string input = in;
     std::vector<std::string> lhs;
@@ -383,7 +384,18 @@ std::vector<boost::variant<int, SemanticNode *>> Lexicon::read_syn_sem(std::stri
 
 
 vector<int> Lexicon::get_all_preds_from_semantic_form(SemanticNode* node){
-
+    std::vector<int> node_preds;
+    if (!node->is_lambda_) {
+        node_preds.push_back(node->idx_);
+    }
+    if (node->children_ == NULL) {
+        return node_preds;
+    }
+    for (SemanticNode *c : node->children_) {
+        std::vector<int> extend = get_all_preds_from_semantic_form(c);
+        node_preds.insert(node_preds.end(), extend.begin(), extend.end());
+    }
+    return node_preds;
 }
 
 // check try catch statement valueerror??
@@ -427,7 +439,7 @@ int Lexicon::read_category_from_str(std::string s){
     }
     if (fin_slash_idx > 0) {
         int output_category_idx = read_category_from_str(s.substr(0, fin_slash_idx));
-        int input_category_idx = read_category_from_str(s.substr(fin_slash_idx + 1, s.length()));
+        int input_category_idx = read_category_from_str(s.substr(fin_slash_idx + 1, s.length() - (fin_slash_idx + 1)));
         boost::variant<std::string, std::vector<int>> category;
         category.push_back(output_category_idx);
         category.push_back(direction);
@@ -455,6 +467,56 @@ int Lexicon::read_category_from_str(std::string s){
 }
 
 SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, vector<std::string> scoped_lambdas){
+    s = s.strip();
+    SemanticNode *node;
+    std::string str_remaining;
+    if(s.substr(0, 6) == "lambda") {
+        std::vector<std::string> str_parts = split(strip(s.substr(6, s.length() - 6)), ".");
+        string info = str_parts[0];
+        std::vector<std::string> name_type = split(info, ":");
+        string name = name_type[0];
+        string type_str = name_type[1];
+        scoped_lambdas.push_back(name);
+        int name_idx = scoped_lambdas.size();
+        int t = ontology->read_type_from_str(type_str);
+        node = SemanticNode(parent, t, category, true, name_idx, true, NULL);
+        for(int i = 1; i < str_parts.size(); i++) {
+            str_remaining += str_parts[i];
+            if (i < str_parts.size() - 1) {
+                str_remaining += ".";
+            }
+        }
+        str_remaining = str_remaining.substr(1, str_remaining.length() - 2);
+    } else {
+        int end_of_pred = 1;
+        while (end_of_pred < s.length()) {
+            if (s[end_of_pred] == "(") {
+                break;
+            }
+            end_of_pred += 1;
+        }
+        string pred = s.substr(0, end_of_pred);
+
+        SemanticNode *curr = parent;
+        bool is_scoped_lambda = false;
+        int pred_idx;
+        while (curr != NULL && !is_scoped_lambda) {
+            try {   
+                pred_idx = scoped_lambdas + 1;
+            } catch() {
+                pred_idx = NULL;
+            }
+        }
+
+
+
+
+
+
+
+
+
+    }
 
 }
 
