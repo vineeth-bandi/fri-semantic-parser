@@ -2,6 +2,7 @@
 #define CYKPARSER_H
 #include "Ontology.h"
 #include "Lexicon.h"
+#include "SemanticNode.h"
 #include "ParseNode.h"
 #include <unordered_map>
 
