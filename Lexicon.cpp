@@ -1,5 +1,5 @@
 #include "Lexicon.h"
-using namespace std;
+
 Lexicon::Lexicon(Ontology* ontology, , bool expanding_ont){
 	this.ontology = ontology;
 	this.allow_expanding_ont = expanding_ont;
@@ -55,12 +55,12 @@ void Lexicon::compute_pred_to_surface(std::map<int, vector<int>> pts){
                 if(!curr.is_lambda){
                     // C++20 now has map.contains().
                     // find might be incorrect for a map (first part of if statement)
-                    if(pts.contains(curr.idx_) && !(std::find(pts[curr.idx_].begin(), pts[curr.idx_].end(), sur_idx) != pts[curr.idx_].end())){
-                        pts[curr.idx_].push_back(sur_idx);
-                    } else if (!pts.contains(curr.idx_)) {
+                    if(pts.contains(curr.idx) && !(std::find(pts[curr.idx].begin(), pts[curr.idx].end(), sur_idx) != pts[curr.idx].end())){
+                        pts[curr.idx].push_back(sur_idx);
+                    } else if (!pts.contains(curr.idx)) {
                         vector<int> sur_idx_vec;
                         sur_idx_vec.push_back(sur_idx);
-                        pts[curr.idx_] = sur_idx_vec;
+                        pts[curr.idx] = sur_idx_vec;
                     }
                 }
                 if (curr.children != NULL) {
@@ -105,7 +105,7 @@ vector<vector<int>> Lexicon::compute_reverse_entries(){
 
 int Lexicon::calc_exp_args(int idx){
     int exp_args = 0;
-    int curr_cat = semantic_forms[idx].category_;
+    int curr_cat = semantic_forms[idx].category;
     while (categories[curr_cat].type() == typeid(std::vector<int>)) {
         exp_args += 1;
         curr_cat = categories[curr_cat][0];
@@ -114,7 +114,7 @@ int Lexicon::calc_exp_args(int idx){
 }
 
 int Lexicon::calc_return_cat(int idx){
-    int curr_cat = semantic_forms[idx].category_;
+    int curr_cat = semantic_forms[idx].category;
     while (categories[curr_cat].type() == typeid(std::vector<int>)) {
         curr_cat = categories[curr_cat][0];
     }
@@ -127,7 +127,7 @@ vector<int> Lexicon::find_consumables_for_cat(int idx) {
     std::vector<vector<int>> consumables;
     for (SemanticNode* sem_form : semantic_forms) {
         //boost
-        boost::variant<std::string, std::vector<int>> curr = categories[sem_form.category_];
+        boost::variant<std::string, std::vector<int>> curr = categories[sem_form.category];
         // while type(curr) is list and type(self.categories[curr[0]]):  what is second part of while loop
         while (curr.type() == typeid(std::vector<int>) && categories[curr[0]].type()) {
             if (curr[0] == idx) {
@@ -205,23 +205,130 @@ vector<int> Lexicon::get_semantic_forms_for_surface_form(vector<SemanticNode *> 
     }
 }
 
-vector<> Lexicon::get_surface_forms_for_predicate(vector<> pred){
+
+vector<int> Lexicon::get_surface_forms_for_predicate(boost::variant<std::string, int> pred){
     if (pred.type() == typeid(std::string)) {
-        
+        std::vector<std::string>::iterator it;
+        if (std::find(ontology -> preds_.begin(), ontology -> preds_.end(), pred) != ontology -> preds_.end()){
+            return pred_to_surface[std::distance(ontology -> preds_.begin(), it)]
+        }
     }
+    else{
+        if (pred_to_surface.find(pred) != pred_to_surface.end()){
+            return pred_to_surface[pred];
+        }
+    }
+    return std::vector<int>();
+}
+
+// custom methods: readfile and strip
+bool readFile(std::string fileName, std::vector<std::string>&fileVec){
+    std::ifstream in(fileName.c_str());
+    if (!in){
+        return false;
+    }
+    std::string line;
+    while (std::getLine(in, line)){
+        if (line.size() > 0){
+            fileVec.push_back(line);
+        }
+    }
+    in.close();
+    return true;
+}
+
+// not sure, no c equivalent for python split
+char *strip(char *s) {
+    size_t size;
+    char *end;
+    size = strlen(s);
+    if (!size)
+        return s;
+    end = s + size - 1;
+    while (end >= s && isspace(*end))
+        end--;
+    *(end + 1) = '\0';
+    while (*s && isspace(*s))
+        s++;
+    return s;
+}
+
+std::vector<std::string> split(std::string in, std::string delimiter){
+    std::string input = in;
+    std::vector<std::string> lhs;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = input.find(delimiter)) != std::string::npos) {
+        token = input.substr(0, pos);
+        lhs.push_back(token);
+        input.erase(0, pos + delimiter.length());
+    }
+    return lhs;
 }
 
 // three diff returns
-void Lexicon::read_lex_from_file(fname, bool allow_expanding_ont, ){
-
+void Lexicon::read_lex_from_file(std::string fname){
+    surface_forms = std::vector<std::string>();
+    semantic_forms = std::vector<SemanticNode *>();
+    entries = std::vector<vector<int>> entries();
+    pred_to_surface = std::map<int, vector<int>>();
+    std::vector<std::string> fileVec; 
+    readFile(fname, fileVec)
+    expand_lex_from_strs(filVec);
 }
 
-void Lexicon::expand_lex_from_strs(vector<> lines, vector<> surface_forms, vector<>semantic_forms, vector<> entries, vector<> pred_to_surface, bool allow_expanding_ont){
 
+void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
+    for(std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it) {
+        std::string line = *it;
+        line = strip(line);
+        if (line.length() == 0 || line[0] == '#') continue;
+
+        //split into two
+        std::vector<std::string> lineParts(split(line, " :- ")); 
+        std::string lhs = lineParts.begin();
+        std::string rhs = lineParts.end();
+        std::string surface_form = strip(lhs);
+
+        std::vector<std::string>::iterator itr = find(surface_forms.begin(), surface_forms.end(), surface_form);
+        size_t sur_idx;
+        if(itr != surface_forms.end()){
+            sur_idx = (size_t)std::distance(surface_forms.begin(), itr);
+        }
+        else{
+            sur_idx = surface_forms.size();
+            surface_forms.push_back(surface_form);
+            entries.append(std::vector<int>());
+        }
+
+        std::vector<boost::variant<int, SemanticNode*>> ret(read_syn_sem(rhs));
+        int cat_idx = ret.begin();
+        SemanticNode* semantic_form = ret.end();
+
+        std::vector<SemanticNode*>::iterator semItr = find(semantic_forms.begin(), semantic_forms.end(), semantic_form);
+        size_t sem_idx;
+        if(semItr != semantic_forms.end()){
+            sem_idx = (size_t)std::distance(semantic_forms.begin(), semItr);
+        }
+        else{
+            sem_idx = semantic_forms.size();
+            semantice_forms.push_back(semantic_form);
+        }
+        entries[sur_idx].push_back(sem_idx);
+        vector<int> preds_in_semantic_form(get_all_preds_from_semantic_form(semantic_forms[sem_idx]));
+        for (std::vector<int>::iterator pred = preds_in_semantic_form.begin(); pred != preds_in_semantic_form.end(); ++pred){
+            if (pred_to_surface.find(*pred) != pred_to_surface.end()){
+                pred_to_surface[*pred].push_back(sur_idx);
+            }
+            else{
+                pred_to_surface[*pred] = std::vector<int>{sur_idx};
+            }
+        }
+    }
 }
 
 // two returns, returns as boost vec of int and semanticnode* (indexes 0 and 1)
-int Lexicon::read_syn_sem_cat_idx(std::string s, bool allow_expanding_ont){
+std::vector<boost::variant<int, SemanticNode *>> Lexicon::read_syn_sem(std::string s){
     std::string str = s;
     std::string delimiter = " : ";
     size_t pos = 0;
@@ -245,22 +352,6 @@ int Lexicon::read_syn_sem_cat_idx(std::string s, bool allow_expanding_ont){
 }
 
 
-// not sure, no c equivalent for python split
-char *strip(char *s) {
-    size_t size;
-    char *end;
-    size = strlen(s);
-    if (!size)
-        return s;
-    end = s + size - 1;
-    while (end >= s && isspace(*end))
-        end--;
-    *(end + 1) = '\0';
-    while (*s && isspace(*s))
-        s++;
-    return s;
-}
-
 vector<int> Lexicon::get_all_preds_from_semantic_form(SemanticNode* node){
 
 }
@@ -275,7 +366,7 @@ int Lexicon::read_category_from_str(std::string s){
 
 
 // new param bool? 
-SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, vector<std::string> scoped_lambdas){
+SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, vector<std::string> scoped_lambdas, bool allow_expanding_ont){
 
 }
 
@@ -285,7 +376,7 @@ void Lexicon::delete_semantic_form_for_surface_form(SemanticNode *surface_form, 
     }
     SemanticNode *matching_semantic_form = NULL;
     for (SemanticNode *semantic_form : semantic_forms) {
-        if (semantic_form.idx_ == ont_idx) {
+        if (semantic_form.idx == ont_idx) {
             matching_semantic_form = semantic_form;
             break;
         }
