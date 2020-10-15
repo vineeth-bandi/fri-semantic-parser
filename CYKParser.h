@@ -14,6 +14,8 @@ typedef std::tuple<int, int, int> tuple3;
 typedef std::tuple<std::vector<int>, std::vector<int>> vvTuple2;
 typedef std::tuple<int, std::vector<int>> ivTuple2;
 typedef boost::variant<SemanticNode, ParseNode> boostNode;
+typedef boost::variant<int, std::string, SemanticNode> lex_entries;
+typedef boost::variant<std::string, ParseNode, std::vector<std::vector<lex_entries>>, std::vector<std::string>> boostT;
 
 class Parameters
 {
@@ -44,7 +46,7 @@ public:
     double get_semantic_score(ParseNode n);
     std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y);
     std::unordered_map<tuple3, int> count_semantics(boostNode sn);
-    //void update_learned_parameters(std::vector<> t); //I dont know types of t here
+    void update_learned_parameters(std::vector<boostT> t);
     std::unordered_map<vvTuple2, int> count_lexical_entries(ParseNode y);
     std::unordered_map<tuple3, int> count_ccg_productions(ParseNode y);
     std::unordered_map<int, int> count_ccg_root(ParseNode y);
