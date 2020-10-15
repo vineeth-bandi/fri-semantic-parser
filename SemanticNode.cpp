@@ -11,11 +11,15 @@ SemanticNode::SemanticNode(SemanticNode *parent, int type, int category, int lam
    is_lambda_ = true;
 }
 
+SemanticNode::SemanticNode(const SemanticNode &a): type_(a.type_), category_(a.category_), lambda_name_(a.lambda_name_), is_lambda_(a.is_lambda_), is_lambda_instantiation_(a.is_lambda_instantiation_), idx_(a.idx_){
+   
+}
 void SemanticNode::set_category(int idx){
    category_ = idx;
    if (std::find(categories_used_.begin(), categories_used_.end(), idx) == categories_used_.end())
       categories_used_.push_back(idx);
 }
+
 
 void SemanticNode::set_return_type(Ontology &ontology){
    bool debug = false;
@@ -103,6 +107,36 @@ void SemanticNode::renumerate_lambdas(std::vector<int> lambdas){
          c->renumerate_lambdas(lambdas);
    }
 }
+
+bool SemanticNode::validate_tree_structure (){
+   if(children_.size() != 0)
+      return true;
+   for(int i =0; i< children_.size();i++){
+      if(children_[i]->parent_ != this)
+         return false;
+      if(!children_[i]->validate_tree_structure())
+         return false;
+   }
+   return true;
+}
+
+void SemanticNode::increment_lambdas(int inc){
+   if(is_lambda_)
+      lambda_name_ += inc;
+   if(children_.size() > 0){
+      for(SemanticNode *c: children_)
+         c->increment_lambdas(inc);
+   }
+}
+
+/* bool SemanticNode::equal_allowing_commutativity(SemanticNode &other, Ontology &ontology, bool ignore_syntax){
+   SemanticNode a = ;
+   SemanticNode b = ;
+} */
+
+
+
+
 
 
 

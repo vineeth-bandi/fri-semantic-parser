@@ -20,6 +20,7 @@ public:
     std::vector<int> categories_used_;
     SemanticNode(SemanticNode *parent, int type, int category, int idx, std::vector<SemanticNode *> children);
     SemanticNode(SemanticNode *parent, int type, int category, int lambda_name, bool is_lambda_instantiation, std::vector<SemanticNode *> children);
+    SemanticNode(const SemanticNode &a);
     void set_category(int idx);
     void set_return_type(Ontology &ontology);
     void copy_attributes(SemanticNode &a, std::vector<int> *lambda_map =NULL, bool preserve_parent = false, 
