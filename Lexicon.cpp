@@ -114,10 +114,11 @@ void Lexicon::update_support_structures() {
 void Lexicon::compute_pred_to_surface(std::map<int, std::vector<int>> pts){
     for (int sur_idx = 0; i < entries.size(); i++) {
         for(int sem_idx : entries[sur_idx]) {
-            vector<SemanticNode *> to_examine;
+            std::vector<SemanticNode *> to_examine;
             to_examine.push_back(semantic_forms[sem_idx]);
             while(to_examine.size() > 0) {
-                SemanticNode *curr = to_examine.pop_back();
+                SemanticNode *curr = to_examine.back();
+                to_examine.pop_back();
                 if(!curr->is_lambda_){
                     // C++20 now has map.contains().
                     // find might be incorrect for a map (first part of if statement)
@@ -402,19 +403,19 @@ vector<int> Lexicon::get_all_preds_from_semantic_form(SemanticNode* node){
 int Lexicon::read_category_from_str(std::string s){
     int p;
     int i;
-    if (s[0] == "(") {
+    if (s[0] == '(' {
         p = 1;
         for (i = 1; i < s.length() - 1; i++) {
-            if (s[i] == "(") {
+            if (s[i] == '(') {
                 p += 1;
-            } else if (s[i] == ")") {
+            } else if (s[i] == ')') {
                 p -= 1;
             }
             if (p == 0) {
                 break;
             }
         }
-        if (i == s.length() - 2 && p == 1 && s[s.length() - 1] == ")") {
+        if (i == s.length() - 2 && p == 1 && s[s.length() - 1] == ')') {
             s = s.substr(1, s.length() - 2);
         }
     }
@@ -422,15 +423,15 @@ int Lexicon::read_category_from_str(std::string s){
     int fin_slash_idx = s.length() - 1;
     int direction;
     while (fin_slash_idx >= 0) {
-        if (s[fin_slash_idx] == ")") {
+        if (s[fin_slash_idx] == ')') {
             p += 1;
-        } else if (s[fin_slash_idx] == "(") {
+        } else if (s[fin_slash_idx] == '(' {
             p -= 1;
         } else if (p == 0) {
-            if (s[fin_slash_idx] == "/") {
+            if (s[fin_slash_idx] == '/') {
                 direction = 1;
                 break;
-            } else if (s[fin_slash_idx] == "\\") {
+            } else if (s[fin_slash_idx] == '\\') {
                 direction = 0;
                 break;
             }
@@ -451,15 +452,12 @@ int Lexicon::read_category_from_str(std::string s){
         }
         category = s;
     }
-    try {
-        int index;
-        auto it = find(categories.begin(), categories.end(), category); 
-        // If element was found 
-        if (it != categories.end()) { 
-            index = distance(categories.begin(), it); 
-        }
-        idx = index;
-    } catch () {
+    int idx;
+    auto it = find(categories.begin(), categories.end(), category); 
+    // If element was found 
+    if (it != categories.end()) { 
+        idx = distance(categories.begin(), it);
+    } else {
         idx = categories.size();
         categories.push_back(category);
     }
@@ -470,6 +468,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
     s = s.strip();
     SemanticNode *node;
     std::string str_remaining;
+    bool is_scoped_lambda = false;
     if(s.substr(0, 6) == "lambda") {
         std::vector<std::string> str_parts = split(strip(s.substr(6, s.length() - 6)), ".");
         string info = str_parts[0];
@@ -479,44 +478,121 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
         scoped_lambdas.push_back(name);
         int name_idx = scoped_lambdas.size();
         int t = ontology->read_type_from_str(type_str);
-        node = SemanticNode(parent, t, category, true, name_idx, true, NULL);
+        node = new SemanticNode(parent, t, category, name_idx, true);
         for(int i = 1; i < str_parts.size(); i++) {
             str_remaining += str_parts[i];
             if (i < str_parts.size() - 1) {
-                str_remaining += ".";
+                str_remaining += '.';
             }
         }
         str_remaining = str_remaining.substr(1, str_remaining.length() - 2);
     } else {
         int end_of_pred = 1;
         while (end_of_pred < s.length()) {
-            if (s[end_of_pred] == "(") {
+            if (s[end_of_pred] == '(' {
                 break;
             }
             end_of_pred += 1;
         }
-        string pred = s.substr(0, end_of_pred);
+        std::string pred = s.substr(0, end_of_pred);
 
         SemanticNode *curr = parent;
-        bool is_scoped_lambda = false;
+        is_scoped_lambda = false;
         int pred_idx;
         while (curr != NULL && !is_scoped_lambda) {
-            try {   
-                pred_idx = scoped_lambdas + 1;
-            } catch() {
+            auto it = find(scoped_lambdas.begin(), scoped_lambdas.end(), pred); 
+            // If element was found 
+            if (it != scoped_lambdas.end()) { 
+                pred_idx = distance(scoped_lambdas.begin(), it) + 1;
+            } else {
                 pred_idx = NULL;
             }
+            if (curr->is_lambda_ && curr->lambda_name_ == pred_idx) {
+                is_scoped_lambda = true;
+            } else {
+                is_scoped_lambda = false;
+            }
+            if (is_scoped_lambda) {
+                break;
+            }
+            curr = curr->parent_;
         }
-
-
-
-
-
-
-
-
-
+        if (is_scoped_lambda) {
+            node = new SemanticNode(parent, curr->type_, NULL, curr->lambda_name_, false);
+        } else {
+            auto it = find(ontology->preds_.begin(), ontology->preds_.end(), pred); 
+            // If element was found 
+            if (it != ontology->preds_.end()) { 
+                pred_idx = distance(ontology->preds_.begin(), it);
+            } else {
+                std::cout << "Symbol not found within ontology or lambdas in scope: '" << pred << "'";
+                exit (EXIT_FAILURE);
+            }
+            node = new SemanticNode(parent, ontology->entries_[pred_idx], category, pred_idx);
+        }
+        str_remaining = s.substr(end_of_pred + 1, s.length() - (end_of_pred + 2));
     }
+    if (str_remaining.length() > 0) {
+        std::vector<int> delineating_comma_idxs;
+        int p = 0;
+        int d = 0;
+        for (int i = 0; i < str_remaining.length(); i++) {
+            if (str_remaining[i] == '(') {
+                p += 1;
+            }
+            else if (str_remaining[i] == ')') {
+                p -= 1;
+            }
+            else if (str_remaining[i] == '<') {
+                d += 1;
+            }
+            else if str_remaining[i] == '>') {
+                d -= 1;
+            }
+            else if (str_remaining[i] == ',' && p == 0 && d == 0) {
+                delineating_comma_idxs.push_back(i);
+            }
+        }
+        std::vector<SemanticNode *> children;
+        std::vector<int> splits;
+        splits.push_back(-1);
+        splits.insert(splits.end(), delineating_comma_idxs.begin(), delineating_comma_idxs.end());
+        splits.push_back(str_remaining.length());
+        std::vector<int> expected_child_cats;
+        int curr_cat = category;
+        while (curr_cat != NULL && categories[curr_cat].type() == typeid(std::vector<int>)) {
+            curr_cat = categories[curr_cat][0];
+            expected_child_cats.push_back(curr_cat);
+        }
+        for (int i = 1; i < splits.length(); i++) {
+            int e_cat;
+            if (expected_child_cats.size() >= i) {
+                e_cat = expected_child_cats[i - 1];
+            } else {
+                e_cat = NULL;
+            }
+            children.push_back(read_semantic_form_from_str(str_remaining.substr(splits[i - 1] + 1, splits[i] - splits[i-1]), e_cat, node, scoped_lambdas));
+        }
+        node->children_ = children;
+    }
+    
+        // try:
+        //     node.set_return_type(self.ontology)
+        // except TypeError as e:
+        //     print(e)
+        //     sys.exit("Offending string: '" + s + "'")
+
+
+    node->set_return_type(ontology);
+
+
+    if (!node->validate_tree_structure()) {
+        std::cout << "ERROR: read in invalidly linked semantic node from string '" << s << "'";
+        exit (EXIT_FAILURE);
+    }
+
+    node = instantiate_wild_type(node);
+    return node;
 
 }
 

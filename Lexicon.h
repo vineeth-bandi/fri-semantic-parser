@@ -11,7 +11,7 @@
 class Lexicon{
 
 public:
-	Lexicon(Ontology ontology, std::string lexicon_fname, std::stringword_embeddings_fn);
+	Lexicon(Ontology ontology, std::string lexicon_fname, std::string word_embeddings_fn);
     Ontology* ontology;
     vector<boost::variant<std::string, std::vector<int>>> categories;
     std::vector<std::vector<int>> entries;
