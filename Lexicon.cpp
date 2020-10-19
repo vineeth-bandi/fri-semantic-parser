@@ -32,41 +32,34 @@ bool readFile(std::string fileName, std::vector<std::string>&fileVec){
     return true;
 }
 
-// not sure, no c equivalent for python strip, change to std::string?
-char *strip(char *s) {
-    size_t size;
-    char *end;
-    size = strlen(s);
-    if (!size)
+std::string strip(std::string s) {
+    size_t first = s.find_first_not_of(' ');
+    if (string::npos == first)
+    {
         return s;
-    end = s + size - 1;
-    while (end >= s && isspace(*end))
-        end--;
-    *(end + 1) = '\0';
-    while (*s && isspace(*s))
-        s++;
-    return s;
+    }
+    size_t last = s.find_last_not_of(' ');
+    return s.substr(first, (last - first + 1));
 }
 
-// rewrite split to be vector not just lhs
 std::vector<std::string> split(std::string in, std::string delimiter){
     std::string input = in;
-    std::vector<std::string> lhs;
+    std::vector<std::string> splitList;
     size_t pos = 0;
     std::string token;
     while ((pos = input.find(delimiter)) != std::string::npos) {
         token = input.substr(0, pos);
-        lhs.push_back(token);
+        splitList.push_back(token);
         input.erase(0, pos + delimiter.length());
     }
-    return lhs;
+    return splitList;
 }
 
 Type load_word_embeddings(std::string fn) {
     // Type wvb = NULL;
     if (fn != NULL) {
         // need c++ equivalent for split
-        bool wvb = fn.split('.')[-1] == 'bin' ? true : false;
+        bool wvb = split(fn, ".")[-1] == 'bin' ? true : false;
 
         // try:
         //     wv = gensim.models.KeyedVectors.load_word2vec_format(fn, binary=wvb, limit=50000)
@@ -348,7 +341,7 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
         //     }
         // }
 
-        // might've fixed.
+        // another version.
         for (int pred : preds_in_semantic_form) {
             if ((std::find(pred_to_surface.begin(), pred_to_surface.end(), pred) != pred_to_surface.end())) {
                 pred_to_surface[pred].push_back(sur_idx);
@@ -373,10 +366,9 @@ std::vector<boost::variant<int, SemanticNode *>> Lexicon::read_syn_sem(std::stri
         str.erase(0, pos + delimiter.length());
     }
     rhs = str;
-    // uses strip function (no c equivalent in python)
-    int cat_idx = read_category_from_str(std::string left(strip(const_cast<char*>(lhs.c_str()))));
-    // check this
-    SemanticNode *semantic_form = read_semantic_form_from_str(std::string right(strip(const_cast<char*>(rhs.c_str()))), cat_idx, NULL, vector<std::string> scoped; , true);
+    int cat_idx = read_category_from_str(strip(lhs));
+    std::vector<std::string> scoped;
+    SemanticNode *semantic_form = read_semantic_form_from_str(strip(rhs), cat_idx, NULL, scoped);
     std::vector<boost::variant<int, SemanticNode *>> returns;
     returns.push_back(cat_idx);
     returns.push_back(semantic_form);
@@ -464,17 +456,17 @@ int Lexicon::read_category_from_str(std::string s){
     return idx;
 }
 
-SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, vector<std::string> scoped_lambdas){
-    s = s.strip();
+SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, std::vector<std::string> scoped_lambdas){
+    s = strip(s);
     SemanticNode *node;
     std::string str_remaining;
     bool is_scoped_lambda = false;
     if(s.substr(0, 6) == "lambda") {
         std::vector<std::string> str_parts = split(strip(s.substr(6, s.length() - 6)), ".");
-        string info = str_parts[0];
+        std::string info = str_parts[0];
         std::vector<std::string> name_type = split(info, ":");
-        string name = name_type[0];
-        string type_str = name_type[1];
+        std::string name = name_type[0];
+        std::string type_str = name_type[1];
         scoped_lambdas.push_back(name);
         int name_idx = scoped_lambdas.size();
         int t = ontology->read_type_from_str(type_str);
