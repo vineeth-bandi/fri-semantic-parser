@@ -103,8 +103,8 @@ void Lexicon::update_support_structures() {
     generator_should_flush = true;
 }
 
-// pts is a dictionary (pred to surface), each contain vector of ints (sur_idxs) std::map<int, vector<int>>
-void Lexicon::compute_pred_to_surface(std::map<int, std::vector<int>> pts){
+// pts is a dictionary (pred to surface), each contain vector of ints (sur_idxs) std::unordered_map<int, vector<int>>
+void Lexicon::compute_pred_to_surface(std::unordered_map<int, std::vector<int>> pts){
     for (int sur_idx = 0; i < entries.size(); i++) {
         for(int sem_idx : entries[sur_idx]) {
             std::vector<SemanticNode *> to_examine;
@@ -113,8 +113,8 @@ void Lexicon::compute_pred_to_surface(std::map<int, std::vector<int>> pts){
                 SemanticNode *curr = to_examine.back();
                 to_examine.pop_back();
                 if(!curr->is_lambda_){
-                    // C++20 now has map.contains().
-                    // find might be incorrect for a map (first part of if statement)
+                    // C++20 now has unordered_map.contains().
+                    // find might be incorrect for a unordered_map (first part of if statement)
                     if(pts.contains(curr->idx_) && !(std::find(pts[curr->idx_].begin(), pts[curr->idx_].end(), sur_idx) != pts[curr->idx_].end())){
                         pts[curr->idx_].push_back(sur_idx);
                     } else if (!pts.contains(curr->idx_)) {
@@ -132,7 +132,7 @@ void Lexicon::compute_pred_to_surface(std::map<int, std::vector<int>> pts){
 }
 
 vector<vector<int>> Lexicon::compute_reverse_entries(){
-    std::map<int, std::vector<int>> r; 
+    std::unordered_map<int, std::vector<int>> r; 
     for (int sur_idx = 0; i < surface_forms.size(); i++) {
         for (int sem_idx : entries[sur_idx]) {
             if (r.contains(sem_idx) && !(std::find(r[sem_idx].begin(), r[sem_idx].end(), sur_idx) != r[sem_idx].end())) {
@@ -287,7 +287,7 @@ void Lexicon::read_lex_from_file(std::string fname){
     surface_forms = std::vector<std::string>();
     semantic_forms = std::vector<SemanticNode *>();
     entries = std::vector<std::vector<int>> entries();
-    pred_to_surface = std::map<int, vector<int>>();
+    pred_to_surface = std::unordered_map<int, vector<int>>();
     std::vector<std::string> fileVec; 
     readFile(fname, fileVec)
     expand_lex_from_strs(filVec);
