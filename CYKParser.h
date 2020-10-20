@@ -67,7 +67,7 @@ public:
     bool perform_type_raising; 
     bool parsing_timeout_on_last_parse;
     std::unordered_map<int, int> type_raised; // map from semantic form idx to their type-raised form idx
-    std::unordered_map<ParseNode left, std::unordered_map<ParseNode right, ParseNode result>> cached_combinations; // indexed by left, then right node, value at result
+    std::unordered_map<ParseNode, std::unordered_map<ParseNode, ParseNode>> cached_combinations; // indexed by left, then right node, value at result
     // additional linguistic information and parameters
     // TODO: read this from configuration files or have user specify it on instantiation
     const int max_multiword_expression = 1;
