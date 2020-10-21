@@ -87,7 +87,7 @@ void SemanticNode::copy_attributes(SemanticNode &a, std::vector<int> *lambda_map
    }
    if(!preserve_children){
       for(SemanticNode *c : children_)
-         free(c);
+         delete(c);
       children_ = std::vector<SemanticNode *>();
       for(int i = 0; i < a.children_.size(); i++){
          SemanticNode *child = new SemanticNode(this, 0, 0, 0, std::vector<SemanticNode *>());
@@ -108,7 +108,7 @@ std::string SemanticNode::print_little(){
    return s;
 }
 
-void SemanticNode::renumerate_lambdas(std::vector<int> lambdas){
+void SemanticNode::renumerate_lambdas(std::vector<int> &lambdas){
    if(is_lambda_){
       if(is_lambda_instantiation_){
          lambdas.push_back(lambda_name_);
@@ -148,11 +148,20 @@ void SemanticNode::increment_lambdas(int inc){
 }
 
 bool SemanticNode::equal_allowing_commutativity(SemanticNode &other, Ontology &ontology, bool ignore_syntax){
-   SemanticNode a(*this);
-   SemanticNode b(*this);
-   a.commutative_raise_node(ontology);
-   b.commutative_raise_node(ontology);
-   return a.equal_ignoring_syntax(b, ignore_syntax=ignore_syntax);
+   SemanticNode *a = new SemanticNode(*this);
+   SemanticNode *b = new SemanticNode(*this);
+   a->commutative_raise_node(ontology);
+   b->commutative_raise_node(ontology);
+   bool ret = a->equal_ignoring_syntax(*b, ignore_syntax=ignore_syntax);
+   delete(a);
+   delete(b);
+   SemanticNode *parent = parent_;
+   while(parent_ != NULL){
+      SemanticNode *temp = parent->parent_;
+      delete(parent);
+      parent = temp;
+   }
+   return ret;
 }
 
 bool compare_by_idx(SemanticNode &a, SemanticNode &b){

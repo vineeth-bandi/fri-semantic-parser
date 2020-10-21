@@ -27,7 +27,7 @@ public:
     void copy_attributes(SemanticNode &a, std::vector<int> *lambda_map =NULL, bool preserve_parent = false, 
         bool preserve_children = false, int lambda_enumeration = 0);
     std::string print_little();
-    void renumerate_lambdas(std::vector<int> lambdas);
+    void renumerate_lambdas(std::vector<int> &lambdas);
     bool validate_tree_structure();
     void increment_lambdas(int inc = 1);
     bool equal_allowing_commutativity(SemanticNode &other, Ontology &ontology, bool ignore_syntax = true);
@@ -38,7 +38,7 @@ public:
     bool equal_ignoring_syntax(SemanticNode &other, bool ignore_synatx = true);
     std::string print_little();
     /* printing object */
-    friend std::ostream& operator<< (std::ostream &strm, const SemanticNode& a);
+    friend std::ostream& operator<< (std::ostream &strm, const SemanticNode &a);
     bool operator== (SemanticNode &other);  /* equality check */
     nodeTuple key(); /* figure out how to make tuple */
     size_t hash(); /* hash code for object */
