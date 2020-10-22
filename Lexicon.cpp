@@ -63,7 +63,8 @@ void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
       std::ifstream in(fn);
 
       std::string line;
-
+      int rows = 50000;
+      int cols = 300;
       int row = 0;
       int col = 0;
 
@@ -118,9 +119,9 @@ void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
    }
 }
 
-vector<> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
-    if (wv.find(w) == wv.end()) {
-       return std::vector<>();
+vector<std::tuple<int, double> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
+    if (vocab.find(w) == vocab.end()) {
+       return std::vector<int, double>();
     }
     std::vector<int> candidate_neighbors = std::vector<int>();
     for(int sfidx =0; sfidx< surface_forms.size(); sfidx++){
@@ -130,17 +131,22 @@ vector<> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
     }
     bool found = false;
      std::vector<double> pred_cosine = std::vector<double>();
+     int w_idx = vocab[w];
+     double w_dist = sqrt((wv.row(v_idx) * wv.row(v_idx).transpose())(0));
      for(int vidx : candidate_neighbors){
         double sim = 0;
         std::string candidate = surface_forms[vidx];
         if(vocab.find(candidate) != vocab.end()){
-           /* compute cosine sim */
+           int candidate_idx = vocab[candidate];
+           double candidate_dist =  sqrt((wv.row(candidate_idx) * wv.row(candidate_idx).transpose())(0));
+           sim = (1.0 + ((test.row(w_idx) * test.row(candidate_idx).transpose())(0))/(w_dist * candidate_dist))/2.0;
            if(sim != 0)
             found = true;
         }
+        pred_cosine.push_back(sim);
      }
    if(!found){
-      return std::vector<>(); 
+      return std::vector<int, double>(); 
    }
     if () {
 
