@@ -136,8 +136,8 @@ void Parameters::update_probabilities(){
             continue;
         num_min = *min_element(nums.begin(), nums.end());
         mass = mass - num_min*size + size;
-        for (int l_idx; l_idx < size; l_idx++){
-            for (int r_idx; r_idx < size; r_idx++){
+        for (int l_idx; l_idx < lex_.categories.size(); l_idx++){
+            for (int r_idx; r_idx < lex_.categories.size(); r_idx++){
                 tuple3 key(cat_idx, l_idx, r_idx);
                 auto it = _CCG_production_counts.find(key);
                 if (it != _CCG_production_counts.end()){
