@@ -180,5 +180,78 @@ void Parameters::update_probabilities(){
             }
         }
     }
+}
 
+std::unordered_map<int, double> Parameters::init_skipwords_given_surface_form(double lexicon_weight){
+    std::unorderd_map<int, double> res;
+    for (int sf_idx = 0; sf_idx < lex_.surface_forms.size(); sf_idx++){
+        res[sf_idx] = -lexicon_weight;
+    }
+    return res;
+}
+
+std::unordered_map<tuple2, double> Parameters::init_ccg_given_token(double lexicon_weight){
+    std::unorderd_map<tuple2, double> res;
+    for (int sf_idx = 0; sf_idx < lex_.entries.size(); sf_idx++){
+        for (int sem_idx : lex_.entries[sf_idx]){
+            tuple2 key(lex_.semantic_forms[sem_idx].category, sf_idx));
+            res[key] = lexicon_weight;
+        }
+    }
+    return res;
+}
+
+std::unordered_map<tuple3, double> init_ccg_production(double lexicon_weight, bool allow_merge){
+    std::unorderd_map<tuple3, double> res;
+    for (int cat_idx = 0; cat_idx < lex_.categories.size(); cat_idx++){
+        std::vector<int[]> consumables = lex_.find_consumables_for_cat(cat_idx);
+        for (int i = 0; i < consumables.size(); i++){
+            int[] con = consumables[i];
+            int d = con[0];
+            int child = con[1];
+            int l;
+            int r;
+            tuple3 key(cat_idx, d, child);
+            if (d == 0){
+                l = child;
+                r = lex_.categories.find(key);
+            }
+            else {
+                r = child;
+                l = lex_.categories.find(key);
+            }
+            tuple3 key2(cat_idx, l, r);
+            res[key2] = lexicon_weight;
+        }
+        if (allow_merge){
+            tuple3 key(cat_idx, cat_idx, cat_idx);
+            res[key] = lexicon_weight;
+        }
+    }
+    return res;
+}
+
+std::unordered_map<tuple2, double> init_lexicon_entry(double lexicon_weight){
+    std::unorderd_map<tuple2, double> res;
+    for (int sf_idx = 0; sf_idx < lex_.entries.size(); sf_idx++){
+        for (int sem_idx : lex_.entries[sf_idx]){
+            tuple2 key(sem_idx, sf_idx));
+            res[key] = lexicon_weight;
+        }
+    }
+    return res;
+}
+
+double get_semantic_score(ParseNode n){
+    std::unordered_map<tuple3, int> counts = count_semantics(n);
+    double score = 0;
+    for(auto const& pair : counts) {
+        auto it = semantic.find(pair.first);
+        if (it != semantic.end()){
+            int count = counts[pair.first];
+            for (int i = 0; i < count; i++)
+                score += it->second;
+        }
+    }
+    return score;
 }
