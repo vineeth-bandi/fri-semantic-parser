@@ -67,7 +67,7 @@ public:
     bool safety;
     bool use_language_model;
     bool allow_merge;
-    bool perform_type_raising; 
+    bool perform_type_raising;
     bool parsing_timeout_on_last_parse;
     std::unordered_map<int, int> type_raised; // map from semantic form idx to their type-raised form idx
     std::unordered_map<ParseNode, std::unordered_map<ParseNode, ParseNode>> cached_combinations; // indexed by left, then right node, value at result
