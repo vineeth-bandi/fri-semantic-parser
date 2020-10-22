@@ -20,25 +20,27 @@ public:
     std::vector<int> categories_used_;
     SemanticNode(SemanticNode *parent, int type, int category, int idx, std::vector<SemanticNode *> children);
     SemanticNode(SemanticNode *parent, int type, int category, int lambda_name, bool is_lambda_instantiation, std::vector<SemanticNode *> children);
+    SemanticNode(SemanticNode &a);
+    ~SemanticNode();
     void set_category(int idx);
     void set_return_type(Ontology &ontology);
     void copy_attributes(SemanticNode &a, std::vector<int> *lambda_map =NULL, bool preserve_parent = false, 
         bool preserve_children = false, int lambda_enumeration = 0);
     std::string print_little();
-    void renumerate_lambdas(std::vector<int> lambdas);
+    void renumerate_lambdas(std::vector<int> &lambdas);
     bool validate_tree_structure();
     void increment_lambdas(int inc = 1);
     bool equal_allowing_commutativity(SemanticNode &other, Ontology &ontology, bool ignore_syntax = true);
     void commutative_raise_node(Ontology &ontology);
     void commutative_lower_node(Ontology &ontology);
     void set_type_from_children_return_types(int r, Ontology &ontology);
-    std::vector<SemanticNode*> commutative_raise(SemanticNode node, int idx);
+    std::vector<SemanticNode *> commutative_raise(SemanticNode &node, int idx);
     bool equal_ignoring_syntax(SemanticNode &other, bool ignore_synatx = true);
     std::string print_little();
     /* printing object */
-    friend std::ostream& operator<< (std::ostream &strm, const SemanticNode& a);
+    friend std::ostream& operator<< (std::ostream &strm, const SemanticNode &a);
     bool operator== (SemanticNode &other);  /* equality check */
-    std::tuple<nodeTuple> key(); /* figure out how to make tuple */
+    nodeTuple key(); /* figure out how to make tuple */
     size_t hash(); /* hash code for object */
 };
 
