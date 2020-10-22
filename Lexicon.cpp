@@ -249,9 +249,9 @@ int Lexicon::calc_return_cat(int idx){
 }
 
 // check return type
-vector<int> Lexicon::find_consumables_for_cat(int idx) {
+std::vector<int[]> Lexicon::find_consumables_for_cat(int idx) {
     // list of list of int or just string
-    std::vector<std::vector<int>> consumables;
+    std::vector<int[]> consumables;
     for (SemanticNode* sem_form : semantic_forms) {
         //boost
         boost::variant<std::string, std::vector<int>> curr = categories[sem_form->category_];
@@ -263,9 +263,7 @@ vector<int> Lexicon::find_consumables_for_cat(int idx) {
             curr = categories[curr[0]];
         } 
         if (curr[0] == idx) {
-            std::vector<int> cons;
-            cons.push_back(curr[1]);
-            cons.push_back(curr[2]);
+            int cons[2] = {curr[1], curr[2]};
             // check this "if cons not in consumables:"
             if (!(std::find(consumables.begin(), consumables.end(), cons) != consumables.end())) {
                 consumables.push_back(cons);
