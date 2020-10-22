@@ -55,26 +55,93 @@ std::vector<std::string> split(std::string in, std::string delimiter){
     return splitList;
 }
 
-Type load_word_embeddings(std::string fn) {
-    // Type wvb = NULL;
-    if (fn != NULL) {
-        // need c++ equivalent for split
-        bool wvb = split(fn, ".")[-1] == 'bin' ? true : false;
+void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
+{
+   if (fn != NULL && fn2 != NULL)
+   {
+      // need c++ equivalent for split
+      std::ifstream in(fn);
 
-        // try:
-        //     wv = gensim.models.KeyedVectors.load_word2vec_format(fn, binary=wvb, limit=50000)
-        // except AttributeError:
-        //     wv = gensim.models.Word2Vec.load_word2vec_format(fn, binary=wvb, limit=50000)
-    }
-    return wv;
+      std::string line;
+
+      int row = 0;
+      int col = 0;
+
+      Eigen::MatrixXd res = Eigen::MatrixXd(rows, cols);
+
+      if (in.is_open())
+      {
+
+         while (std::getline(in, line))
+         {
+
+            char *ptr = (char *)line.c_str();
+            int len = line.length();
+
+            col = 0;
+
+            char *start = ptr;
+            for (int i = 0; i < len; i++)
+            {
+
+               if (ptr[i] == ',')
+               {
+                  res(row, col++) = atof(start);
+                  start = ptr + i + 1;
+               }
+            }
+            res(row, col) = atof(start);
+
+            row++;
+         }
+
+         in.close();
+      }
+      wv = res;
+
+   std::ifstream in(fn2);
+   std::string line;
+   std::unordered_map<std::string, int> dict = std::unordered_map<std::string, int>();
+   if (in.is_open())
+   {
+      while ((std::getline(in, line)))
+      {
+         char *saveptr = NULL;
+         char *ptr = (char *)line.c_str();
+         int len = line.length();
+         char *key = strtok_r(ptr, ",", &saveptr);
+         int val = atoi(strtok_r(NULL, ",", &saveptr));
+         dict[std::string(key)] = val;
+      }
+   }
+   vocab = dict;
+   }
 }
 
-vector<> Lexicon::get_lexicon_word_embedding_neighbors(w, int n) {
-    if () {
-
+vector<> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
+    if (wv.find(w) == wv.end()) {
+       return std::vector<>();
     }
-    candidate_neighbors;
-    pred_cosine;
+    std::vector<int> candidate_neighbors = std::vector<int>();
+    for(int sfidx =0; sfidx< surface_forms.size(); sfidx++){
+       if(std::find(neighbor_surface_forms.begin(), neighbor_surface_forms.end(), sfidx) == neighbor_surface_forms.end()){
+          candidate_neighbors.push_back(sfidx);
+       }
+    }
+    bool found = false;
+     std::vector<double> pred_cosine = std::vector<double>();
+     for(int vidx : candidate_neighbors){
+        double sim = 0;
+        std::string candidate = surface_forms[vidx];
+        if(vocab.find(candidate) != vocab.end()){
+           /* compute cosine sim */
+           if(sim != 0)
+            found = true;
+        }
+     }
+   if(!found){
+      return std::vector<>(); 
+   }
     if () {
 
     }

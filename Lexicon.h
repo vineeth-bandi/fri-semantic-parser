@@ -9,11 +9,11 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
-
+#include <Eigen/Dense>
 class Lexicon{
 
 public:
-	Lexicon(Ontology ontology, std::string lexicon_fname, std::string word_embeddings_fn);
+	Lexicon(Ontology &ontology, std::string lexicon_fname, std::string word_embeddings_fn);
     Ontology* ontology;
     std::vector<boost::variant<std::string, std::vector<int>>> categories;
     std::vector<std::vector<int>> entries;
@@ -27,7 +27,9 @@ public:
     std::vector<std::vector<std::vector<int>>> category_consumes;
     bool generator_should_flush;
     bool sem_form_expected;
-
+	Eigen::MatrixXd wv;
+	std::unordered_map<std::string, int> vocab;
+	void load_word_embeddings(std::string fn, std::string fn2);
 	std::vector<> get_lexicon_word_embedding_neighbors(w, int n) // nalin
 
 	void update_support_structures();
