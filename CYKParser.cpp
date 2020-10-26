@@ -256,79 +256,21 @@ double get_semantic_score(ParseNode n){
     return score;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TODO: complete method
-SemanticNode* CYKParser::perform_merge(SemanticNode* a, SemanticNode* b){
-    return a;
+std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y){
+    std::unordered_map<vvTuple2, int> res;
+    std::vector<int> t;
+    for (ParseNode* n : y.get_leaves()){
+        t.push_back(lex_.surface_forms.at(n->surface_form_));
+    }
+    t.insert(0, -2);
+    t.push_back(-3);
+    for (int i = 0; i < t.size() - 1; i++){
+        key(t[i], t[i+1]);
+        auto it = res.find(key);
+        if (it == res.end()){
+            res[key] = 0;
+        }
+        res[key] += 1;
+    }
+    return res;
 }
-
-// TODO: complete method
-bool CYKParser::can_perform_merge(SemanticNode* a, SemanticNode* b){
-    return true;
-}
-
-// TODO: complete method
-SemanticNode* CYKParser::perform_fa(SemanticNode* a, SemanticNode* b){
-    return a;
-}
-
-// TODO: complete method
-bool CYKParser::can_perform_fa(int i, int j, SemanticNode* a, SemanticNode* b){
-    return lambda_value_replacements_valid(a.children_[0], a -> lambda_name_, std::vector<int>(), b, b_lambda_context);
-}
-
-// TODO: complete method
-bool CYKParser::lambda_value_replacements_valid(SemanticNode* a, int lambda_name, std::vector<int>a_lambda_context, SemanticNode* b, std::vector<int>b_lambda_context){
-    bool valid_through_children = true;
-    return valid_through_children;
-}
-
-// TODO: complete method
-std::vector<std::vector<SemanticNode*>> CYKParser::perform_split(SemanticNode* ab){
-    std::vector<std::vector<SemanticNode*>> candidate_pairs();
-    return candidate_pairs;
-}   
-
-// TODO: complete method
-bool CYKParser::can_perform_split(SemanticNode* ab){
-    return true;
-}
-
-// TODO: complete method
-std::vector<std::vector<boost::variant<int, SemanticNode*>>> CYKParser::perform_reverse_fa(SemanticNode* a){
-    std::vector<std::vector<boost::variant<int, SemanticNode*>>> candidate_pairs();
-    return candidate_pairs;
-}
-
-// just splits the input string input a vector of letters
-// uses lexicon method
-std::vector<std::string> CYKParser::tokenize(std::string s){
-    return Leixcon::split(s);
-}
-
-// TODO: complete method
-// given a sorted list of tuples as (key, value), shuffle the sublists with matching values
-std::vector<std::tuple> CYKParser::shuffle_ties(std::vector<std::tuple> l){
-    return l;
-}
-
