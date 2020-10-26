@@ -9,6 +9,7 @@ main.cpp
 Ontology.cpp 
 ParseNode.cpp
 SemanticNode.cpp
+Lexicon.cpp
 )
 
 target_include_directories(main PUBLIC ${Boost_INCLUDE_DIRS}) 

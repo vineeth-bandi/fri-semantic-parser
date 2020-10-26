@@ -123,6 +123,33 @@ main/fast:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+Lexicon.o: Lexicon.cpp.o
+
+.PHONY : Lexicon.o
+
+# target to build an object file
+Lexicon.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Lexicon.cpp.o
+.PHONY : Lexicon.cpp.o
+
+Lexicon.i: Lexicon.cpp.i
+
+.PHONY : Lexicon.i
+
+# target to preprocess a source file
+Lexicon.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Lexicon.cpp.i
+.PHONY : Lexicon.cpp.i
+
+Lexicon.s: Lexicon.cpp.s
+
+.PHONY : Lexicon.s
+
+# target to generate assembly for a file
+Lexicon.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/Lexicon.cpp.s
+.PHONY : Lexicon.cpp.s
+
 Ontology.o: Ontology.cpp.o
 
 .PHONY : Ontology.o
@@ -240,6 +267,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... main"
 	@echo "... edit_cache"
+	@echo "... Lexicon.o"
+	@echo "... Lexicon.i"
+	@echo "... Lexicon.s"
 	@echo "... Ontology.o"
 	@echo "... Ontology.i"
 	@echo "... Ontology.s"
