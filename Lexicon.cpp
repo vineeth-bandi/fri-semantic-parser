@@ -380,8 +380,8 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
 
         //split into two
         std::vector<std::string> lineParts(split(line, " :- ")); 
-        std::string lhs = lineParts.begin();
-        std::string rhs = lineParts.end();
+        std::string lhs = lineParts[0];
+        std::string rhs = lineParts[lineParts.size() -1];
         std::string surface_form = strip(lhs);
 
         std::vector<std::string>::iterator itr = find(surface_forms.begin(), surface_forms.end(), surface_form);
@@ -392,12 +392,12 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
         else{
             sur_idx = surface_forms.size();
             surface_forms.push_back(surface_form);
-            entries.append(std::vector<int>());
+            entries.push_back(std::vector<int>());
         }
 
         std::vector<boost::variant<int, SemanticNode*>> ret(read_syn_sem(rhs));
-        int cat_idx = ret.begin();
-        SemanticNode* semantic_form = ret.end();
+        int cat_idx = boost::get<int>(ret[0]);
+        SemanticNode* semantic_form = boost::get<SemanticNode *>(ret[1]);
 
         std::vector<SemanticNode*>::iterator semItr = find(semantic_forms.begin(), semantic_forms.end(), semantic_form);
         size_t sem_idx;
@@ -406,7 +406,7 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
         }
         else{
             sem_idx = semantic_forms.size();
-            semantice_forms.push_back(semantic_form);
+            semantic_forms.push_back(semantic_form);
         }
         entries[sur_idx].push_back(sem_idx);
         std::vector<int> preds_in_semantic_form = get_all_preds_from_semantic_form(semantic_forms[sem_idx]);
@@ -424,7 +424,7 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
             if ((std::find(pred_to_surface.begin(), pred_to_surface.end(), pred) != pred_to_surface.end())) {
                 pred_to_surface[pred].push_back(sur_idx);
             } else {
-                pred_to_surface[pred] = std::vector<int>{sur_idx};
+                pred_to_surface[pred] = std::vector<int>{(int)sur_idx};
             }
         }
     }
@@ -459,7 +459,7 @@ std::vector<int> Lexicon::get_all_preds_from_semantic_form(SemanticNode* node){
     if (!node->is_lambda_) {
         node_preds.push_back(node->idx_);
     }
-    if (node->children_ == NULL) {
+    if (node->children_.size() == 0) {
         return node_preds;
     }
     for (SemanticNode *c : node->children_) {
@@ -473,7 +473,7 @@ std::vector<int> Lexicon::get_all_preds_from_semantic_form(SemanticNode* node){
 int Lexicon::read_category_from_str(std::string s){
     int p;
     int i;
-    if (s[0] == '(' {
+    if (s[0] == '(') {
         p = 1;
         for (i = 1; i < s.length() - 1; i++) {
             if (s[i] == '(') {
@@ -495,7 +495,7 @@ int Lexicon::read_category_from_str(std::string s){
     while (fin_slash_idx >= 0) {
         if (s[fin_slash_idx] == ')') {
             p += 1;
-        } else if (s[fin_slash_idx] == '(' {
+        } else if (s[fin_slash_idx] == '(') {
             p -= 1;
         } else if (p == 0) {
             if (s[fin_slash_idx] == '/') {
@@ -508,19 +508,21 @@ int Lexicon::read_category_from_str(std::string s){
         }
         fin_slash_idx -= 1;
     }
+    boost::variant<std::string, std::vector<int>> category;
     if (fin_slash_idx > 0) {
         int output_category_idx = read_category_from_str(s.substr(0, fin_slash_idx));
         int input_category_idx = read_category_from_str(s.substr(fin_slash_idx + 1, s.length() - (fin_slash_idx + 1)));
-        boost::variant<std::string, std::vector<int>> category;
-        category.push_back(output_category_idx);
-        category.push_back(direction);
-        category.push_back(input_category_idx);
+        std::vector<int> temp;
+        temp.push_back(output_category_idx);
+        temp.push_back(direction);
+        temp.push_back(input_category_idx);
+        category = boost::variant<std::string, std::vector<int>>(temp);
     } else {
         if (s.find("(") != std::string::npos || s.find(")") != std::string::npos || s.find("\\") != std::string::npos) {
             std::cout << "Invalid atomic category '" << s << "'";
             exit (EXIT_FAILURE);
         }
-        category = s;
+        category = boost::variant<std::string, std::vector<int>>(s);
     }
     int idx;
     auto it = find(categories.begin(), categories.end(), category); 
@@ -548,7 +550,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
         scoped_lambdas.push_back(name);
         int name_idx = scoped_lambdas.size();
         int t = ontology->read_type_from_str(type_str);
-        node = new SemanticNode(parent, t, category, name_idx, true);
+        node = new SemanticNode(parent, t, category, name_idx, true, std::vector<SemanticNode *>());
         for(int i = 1; i < str_parts.size(); i++) {
             str_remaining += str_parts[i];
             if (i < str_parts.size() - 1) {
@@ -559,7 +561,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
     } else {
         int end_of_pred = 1;
         while (end_of_pred < s.length()) {
-            if (s[end_of_pred] == '(' {
+            if (s[end_of_pred] == '(') {
                 break;
             }
             end_of_pred += 1;
@@ -574,12 +576,10 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             // If element was found 
             if (it != scoped_lambdas.end()) { 
                 pred_idx = distance(scoped_lambdas.begin(), it) + 1;
+                if (curr->is_lambda_ && curr->lambda_name_ == pred_idx)
+                    is_scoped_lambda = true;
             } else {
-                pred_idx = NULL;
-            }
-            if (curr->is_lambda_ && curr->lambda_name_ == pred_idx) {
-                is_scoped_lambda = true;
-            } else {
+                pred_idx = -1;
                 is_scoped_lambda = false;
             }
             if (is_scoped_lambda) {
@@ -588,7 +588,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             curr = curr->parent_;
         }
         if (is_scoped_lambda) {
-            node = new SemanticNode(parent, curr->type_, NULL, curr->lambda_name_, false);
+            node = new SemanticNode(parent, curr->type_, -1, curr->lambda_name_, false);
         } else {
             auto it = find(ontology->preds_.begin(), ontology->preds_.end(), pred); 
             // If element was found 

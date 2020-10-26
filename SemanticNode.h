@@ -18,8 +18,8 @@ public:
     int candidate_type_;
     std::vector<SemanticNode *> children_;
     std::vector<int> categories_used_;
-    SemanticNode(SemanticNode *parent, int type, int category, int idx, std::vector<SemanticNode *> children);
-    SemanticNode(SemanticNode *parent, int type, int category, int lambda_name, bool is_lambda_instantiation, std::vector<SemanticNode *> children);
+    SemanticNode(SemanticNode *parent, int type, int category, int idx, std::vector<SemanticNode *> children= {});
+    SemanticNode(SemanticNode *parent, int type, int category, int lambda_name, bool is_lambda_instantiation, std::vector<SemanticNode *> children = {});
     SemanticNode(SemanticNode &a);
     ~SemanticNode();
     void set_category(int idx);
