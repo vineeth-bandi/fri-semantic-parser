@@ -255,3 +255,25 @@ double get_semantic_score(ParseNode n){
     }
     return score;
 }
+
+std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y){
+    std::unordered_map<vvTuple2, int> res;
+    std::vector<int> t;
+    for (ParseNode* n : y.get_leaves()){
+        t.push_back(n->surface_form_);
+    }
+    for (int i = 0; i < t.size(); i++){
+        if (t[i] != NULL){
+
+        }
+    }
+    for (int i = 0; i < t.size() - 1; i++){
+        key(t[i], t[i+1]);
+        auto it = res.find(key);
+        if (it == res.end()){
+            res[key] = 0;
+        }
+        res[key] += 1;
+    }
+    return res;
+}
