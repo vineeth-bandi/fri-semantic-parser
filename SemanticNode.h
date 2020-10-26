@@ -7,7 +7,7 @@ typedef std::tuple<int, int, bool, int, int, bool, std::vector<size_t>> nodeTupl
 class SemanticNode
 {
 public:
-    SemanticNode* parent_;
+    SemanticNode *parent_;
     int type_;
     int category_;
     bool is_lambda_;
@@ -24,9 +24,8 @@ public:
     ~SemanticNode();
     void set_category(int idx);
     void set_return_type(Ontology &ontology);
-    void copy_attributes(SemanticNode &a, std::vector<int> *lambda_map =NULL, bool preserve_parent = false, 
-        bool preserve_children = false, int lambda_enumeration = 0);
-    std::string print_little();
+    void copy_attributes(SemanticNode &a, std::vector<int> *lambda_map = NULL, bool preserve_parent = false,
+                         bool preserve_children = false, int lambda_enumeration = 0);
     void renumerate_lambdas(std::vector<int> &lambdas);
     bool validate_tree_structure();
     void increment_lambdas(int inc = 1);
@@ -36,12 +35,21 @@ public:
     void set_type_from_children_return_types(int r, Ontology &ontology);
     std::vector<SemanticNode *> commutative_raise(SemanticNode &node, int idx);
     bool equal_ignoring_syntax(SemanticNode &other, bool ignore_synatx = true);
-    std::string print_little();
+    std::string print_little()
+    {
+        std::string s = "(";
+        if (is_lambda_)
+            s += std::to_string(is_lambda_) + ',' + std::to_string(type_) + ',' + std::to_string(lambda_name_);
+        else
+            s += std::to_string(idx_);
+        s += ")";
+        return s;
+    }
     /* printing object */
-    friend std::ostream& operator<< (std::ostream &strm, const SemanticNode &a);
-    bool operator== (SemanticNode &other);  /* equality check */
-    nodeTuple key(); /* figure out how to make tuple */
-    size_t hash(); /* hash code for object */
+    bool
+    operator==(SemanticNode &other); /* equality check */
+    nodeTuple key();                 /* figure out how to make tuple */
+    size_t hash();                   /* hash code for object */
 };
 
 #endif

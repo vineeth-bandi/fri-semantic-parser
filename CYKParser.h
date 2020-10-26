@@ -96,8 +96,17 @@ public:
     most_likely_cky_parse(std::string s, int reranker_beam = 1, ParseNode known_root = NULL, reverse_fa_beam, bool debug = false, timeout);
 
 
+
+    SemanticNode* perform_merge(SemanticNode* a, SemanticNode* b);
+    bool can_perform_merge(SemanticNode* a, SemanticNode* b);
+    SemanticNode* perform_fa(SemanticNode* a, SemanticNode* b);
+    bool can_perform_fa(int i, int j, SemanticNode* a, SemanticNode* b);
+    bool lambda_value_replacements_valid(SemanticNode* a, int lambda_name, std::vector<int>a_lambda_context, SemanticNode* b, std::vector<int>b_lambda_context);
+    std::vector<std::vector<SemanticNode*>> perform_split(SemanticNode* ab);
+    bool can_perform_split(SemanticNode* ab);
+    std::vector<std::vector<boost::variant<int, SemanticNode*>>> perform_reverse_fa(SemanticNode* a);
     std::vector<std::string> tokenize(std::string s);
-    
+    std::vector<std::tuple> shuffle_ties(std::vector<std::tuple> l);
 };
 
 
