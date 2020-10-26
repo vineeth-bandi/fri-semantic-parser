@@ -1,7 +1,6 @@
 #include "Lexicon.h"
 
-Lexicon::Lexicon(Ontology* ontology, std::string lexicon_fname, std::string word_embeddings_fn){
-	this.ontology = ontology;
+Lexicon::Lexicon(Ontology* onto, std::string lexicon_fname, std::string word_embeddings_fn): ontology(onto){
     // surface_forms = 
     // semantic_forms = ;
     // entries = ;
@@ -59,20 +58,15 @@ void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
 {
    if (fn != NULL && fn2 != NULL)
    {
-      // need c++ equivalent for split
       std::ifstream in(fn);
-
       std::string line;
       int rows = 50000;
       int cols = 300;
       int row = 0;
       int col = 0;
-
       Eigen::MatrixXd res = Eigen::MatrixXd(rows, cols);
-
       if (in.is_open())
       {
-
          while (std::getline(in, line))
          {
 
@@ -92,10 +86,8 @@ void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
                }
             }
             res(row, col) = atof(start);
-
             row++;
          }
-
          in.close();
       }
       wv = res;
@@ -119,7 +111,7 @@ void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
    }
 }
 
-std::vector<std::tuple<int, double> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
+std::vector<std::tuple<int, double>> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
     if (vocab.find(w) == vocab.end()) {
        return std::vector<std::tuple<int, double>>();
     }
@@ -220,7 +212,7 @@ void Lexicon::compute_pred_to_surface(std::unordered_map<int, std::vector<int>> 
     }
 }
 
-vector<vector<int>> Lexicon::compute_reverse_entries(){
+std::vector<std::vector<int>> Lexicon::compute_reverse_entries(){
     std::unordered_map<int, std::vector<int>> r; 
     for (int sur_idx = 0; i < surface_forms.size(); i++) {
         for (int sem_idx : entries[sur_idx]) {
@@ -311,7 +303,7 @@ int Lexicon::get_or_add_category(boost::variant<std::vector<int>, std::string> c
     return categories.size() - 1;
 }
 
-string Lexicon::compose_str_from_category(int idx){
+std::string Lexicon::compose_str_from_category(int idx){
     if(idx == NULL) {
         return "NONE IDX";
     }
@@ -335,7 +327,7 @@ string Lexicon::compose_str_from_category(int idx){
 }
 
 // find return type
-vector<int> Lexicon::get_semantic_forms_for_surface_form(vector<SemanticNode *> surface_form){
+std::vector<int> Lexicon::get_semantic_forms_for_surface_form(vector<SemanticNode *> surface_form){
     if (!(std::find(surface_forms.begin(), surface_forms.end(), surface_form) != surface_forms.end())) {
         return std::vector<int> empty_vec;
     } else {
@@ -353,7 +345,7 @@ vector<int> Lexicon::get_semantic_forms_for_surface_form(vector<SemanticNode *> 
 }
 
 
-vector<int> Lexicon::get_surface_forms_for_predicate(boost::variant<std::string, int> pred){
+std::vector<int> Lexicon::get_surface_forms_for_predicate(boost::variant<std::string, int> pred){
     if (pred.type() == typeid(std::string)) {
         std::vector<std::string>::iterator it;
         if (std::find(ontology -> preds_.begin(), ontology -> preds_.end(), pred) != ontology -> preds_.end()){
@@ -463,7 +455,7 @@ std::vector<boost::variant<int, SemanticNode *>> Lexicon::read_syn_sem(std::stri
 }
 
 
-vector<int> Lexicon::get_all_preds_from_semantic_form(SemanticNode* node){
+std::vector<int> Lexicon::get_all_preds_from_semantic_form(SemanticNode* node){
     std::vector<int> node_preds;
     if (!node->is_lambda_) {
         node_preds.push_back(node->idx_);

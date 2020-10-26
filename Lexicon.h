@@ -30,7 +30,7 @@ public:
 	Eigen::MatrixXd wv;
 	std::unordered_map<std::string, int> vocab;
 	void load_word_embeddings(std::string fn, std::string fn2);
-	std::vector<> get_lexicon_word_embedding_neighbors(w, int n) // nalin
+	std::vector<std::tuple<int, double>> get_lexicon_word_embedding_neighbors(w, int n) // nalin
 
 	void update_support_structures();
 	void compute_pred_to_surface(std::unordered_map<int, std::vector<int>>);
