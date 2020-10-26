@@ -24,7 +24,7 @@ public:
 	std::vector<std::string> neighbor_surface_forms;
     std::vector<int> sem_form_expected_args;
     std::vector<int> sem_form_return_cat;
-    std::vector<std::vector<std::vector<int>>> category_consumes;
+    std::vector<std::vector<int[]>> category_consumes;
     bool generator_should_flush;
     bool sem_form_expected;
 	Eigen::MatrixXd wv;
@@ -37,7 +37,7 @@ public:
 	std::vector<std::vector<int>> compute_reverse_entries();
 	int calc_exp_args(int idx);
 	int calc_return_cat(int idx);
-	std::vector<int> find_consumables_for_cat(int idx);
+	std::vector<int[]> find_consumables_for_cat(int idx);
 	int get_or_add_category(boost::variant<std::vector<int>, std::string> c);
 	std::string compose_str_from_category(int idx);
 	std::vector<SemanticNode *> get_semantic_forms_for_surface_form(std::vector<> surface_form);

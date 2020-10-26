@@ -5,7 +5,8 @@
 #include "SemanticNode.h"
 #include "ParseNode.h"
 #include <unordered_map>
-
+#include <string>
+#include <vector>
 
 std::string ont_fname = "ont.txt";
 std::string lex_fname = "lex.txt";
@@ -14,6 +15,8 @@ typedef std::tuple<int, int> tuple2;
 typedef std::tuple<int, int, int> tuple3;
 typedef std::tuple<std::vector<int>, std::vector<int>> vvTuple2;
 typedef std::tuple<int, std::vector<int>> ivTuple2;
+typedef std::tuple<std::string, SemanticNode> dTuple;
+typedef std::tuple<std::string, ParseNode, ParseNode, std::vector<std::vector<int>>, std::vector<std::vector<int>>, std::vector<std::string>, std::vector<std::string>> tupleTP;
 typedef boost::variant<SemanticNode, ParseNode> boostNode;
 typedef boost::variant<int, std::string, SemanticNode> lex_entries;
 typedef boost::variant<std::string, ParseNode, std::vector<std::vector<lex_entries>>, std::vector<std::string>> boostT;
@@ -64,7 +67,7 @@ public:
     bool safety;
     bool use_language_model;
     bool allow_merge;
-    bool perform_type_raising; 
+    bool perform_type_raising;
     bool parsing_timeout_on_last_parse;
     std::unordered_map<int, int> type_raised; // map from semantic form idx to their type-raised form idx
     std::unordered_map<ParseNode, std::unordered_map<ParseNode, ParseNode>> cached_combinations; // indexed by left, then right node, value at result
@@ -83,7 +86,27 @@ public:
     const int max_skip_sequences_to_consider = 32;
     const int training_max_topdown_trees_to_consider = 32;
     const int max_leaf_assignments_to_consider = 64;
-    // *should i give the integers values in the cpp rather than here?*
+    //method headers
+    double get_language_model_score(ParseNode y);
+    void type_raise_bare_nouns();
+    std::string print_parse(SemanticNode p, bool show_category = false, bool show_lambda_types = false);
+    std::vector<dTuple> read_in_paired_utterance_semantics(std::string fname);
+    bool train_learner_on_semantic_forms(vector<dTuple> d, int epochs = 10, int epoch_offset = 0, int reranker_beam = 1, int verbose = 2, bool use_condor = false, std::string condor_target_dir, std::string condor_script_dir, std::vector<int> perf_log);
+    std::tuple<tupleTP, int> get_training_pairs(vector<dTuple> d, int verbose = 2, int reranker_beam = 1, bool use_condor = false, std::string condor_target_dir, std::string condor_script_dir);
+    most_likely_cky_parse(std::string s, int reranker_beam = 1, ParseNode known_root = NULL, reverse_fa_beam, bool debug = false, timeout);
+
+
+
+    SemanticNode* perform_merge(SemanticNode* a, SemanticNode* b);
+    bool can_perform_merge(SemanticNode* a, SemanticNode* b);
+    SemanticNode* perform_fa(SemanticNode* a, SemanticNode* b);
+    bool can_perform_fa(int i, int j, SemanticNode* a, SemanticNode* b);
+    bool lambda_value_replacements_valid(SemanticNode* a, int lambda_name, std::vector<int>a_lambda_context, SemanticNode* b, std::vector<int>b_lambda_context);
+    std::vector<std::vector<SemanticNode*>> perform_split(SemanticNode* ab);
+    bool can_perform_split(SemanticNode* ab);
+    std::vector<std::vector<boost::variant<int, SemanticNode*>>> perform_reverse_fa(SemanticNode* a);
+    std::vector<std::string> tokenize(std::string s);
+    std::vector<std::tuple> shuffle_ties(std::vector<std::tuple> l);
 };
 
 
