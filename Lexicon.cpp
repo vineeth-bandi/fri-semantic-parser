@@ -119,9 +119,9 @@ void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
    }
 }
 
-vector<std::tuple<int, double> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
+std::vector<std::tuple<int, double> Lexicon::get_lexicon_word_embedding_neighbors(std::string w, int n) {
     if (vocab.find(w) == vocab.end()) {
-       return std::vector<int, double>();
+       return std::vector<std::tuple<int, double>>();
     }
     std::vector<int> candidate_neighbors = std::vector<int>();
     for(int sfidx =0; sfidx< surface_forms.size(); sfidx++){
@@ -132,30 +132,46 @@ vector<std::tuple<int, double> Lexicon::get_lexicon_word_embedding_neighbors(std
     bool found = false;
      std::vector<double> pred_cosine = std::vector<double>();
      int w_idx = vocab[w];
-     double w_dist = sqrt((wv.row(v_idx) * wv.row(v_idx).transpose())(0));
+     double w_dist = sqrt((wv.row(w_idx) * wv.row(w_idx).transpose())(0));
      for(int vidx : candidate_neighbors){
         double sim = 0;
         std::string candidate = surface_forms[vidx];
         if(vocab.find(candidate) != vocab.end()){
            int candidate_idx = vocab[candidate];
            double candidate_dist =  sqrt((wv.row(candidate_idx) * wv.row(candidate_idx).transpose())(0));
-           sim = (1.0 + ((test.row(w_idx) * test.row(candidate_idx).transpose())(0))/(w_dist * candidate_dist))/2.0;
-           if(sim != 0)
-            found = true;
+           sim = ((wv.row(w_idx) * wv.row(candidate_idx).transpose())(0))/(w_dist * candidate_dist);
+           sim = abs(sim);
+           sim = (sim + 1.0)/2.0;
         }
         pred_cosine.push_back(sim);
      }
-   if(!found){
-      return std::vector<int, double>(); 
-   }
-    if () {
-
+    double max_prob = 0;
+    for(double prob : pred_cosine)
+        max_prob = max_prob > prob ? max_prob : prob;
+    if(max_prob == 0)
+        return std::vector<std::tuple<int, double>>();
+    std::vector<std::tuple<int, double>> max_sims = std::vector<std::tuple<int, double>> ();
+    for(int i =0; i < pred_cosine.size(); i++){
+        double x = pred_cosine[i];
+        if(std::abs(x - max_prob) <= (1e-08 + 1e-05 * std::abs(max_prob)))
+            max_sims.push_back(std::tuple<int, double>(i, x));
     }
-    vector<> top_k_sims;
+    std::vector<std::tuple<int, double>> top_k_sims(max_sims);
 
     while (top_k_sims.size() < n && top_k_sims.size() < candidate_neighbors.size()) {
-        int curr_max_val;
-        top_k_sims.push_back();
+        double curr_max_val = 0;
+        for(int sidx =0; i< candidate_neighbors.size(); i++){
+            bool found = false;
+            for(std::tuple<int, double> x : top_k_sims)
+                found = std::get<0>(x) == sidx;
+            if(!found)
+                curr_max_val = curr_max_val >= pred_cosine[sidx] ? curr_max_val : pred_cosine[sidx];
+        }
+        for(int i =0; i < pred_cosine.size(); i++){
+            double x = pred_cosine[i];
+            if(std::abs(x - curr_max_val) <= (1e-08 + 1e-05 * std::abs(curr_max_val)))
+                top_k_sims.push_back(std::tuple<int, double>(i, x));
+        }
     }
     return top_k_sims;
 }

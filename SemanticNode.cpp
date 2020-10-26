@@ -98,16 +98,6 @@ void SemanticNode::copy_attributes(SemanticNode &a, std::vector<int> *lambda_map
    return_type_ = a.return_type_;
 }
 
-std::string SemanticNode::print_little(){
-   std::string s = "(";
-   if(is_lambda_)
-      s += std::to_string(is_lambda_) + ',' + std::to_string(type_) + ',' + std::to_string(lambda_name_);
-   else
-      s += std::to_string(idx_);
-   s += ")";
-   return s;
-}
-
 void SemanticNode::renumerate_lambdas(std::vector<int> &lambdas){
    if(is_lambda_){
       if(is_lambda_instantiation_){
@@ -164,8 +154,8 @@ bool SemanticNode::equal_allowing_commutativity(SemanticNode &other, Ontology &o
    return ret;
 }
 
-bool compare_by_idx(SemanticNode &a, SemanticNode &b){
-   return a.idx_ < b.idx_;
+bool compare_by_idx(SemanticNode *a, SemanticNode *b){
+   return a->idx_ < b->idx_;
 }
 
 void SemanticNode::commutative_raise_node(Ontology &ontology){
@@ -223,10 +213,10 @@ void SemanticNode::set_type_from_children_return_types(int r, Ontology &ontology
       std::vector<int> new_type_form = std::vector<int>();
       new_type_form.push_back(children_[i]->return_type_);
       new_type_form.push_back(new_type);
-      if(std::find(ontology.types_.begin(), ontology.types_.end(), new_type_form) != ontology.types_.end()){
+      if(std::find(ontology.types_.begin(), ontology.types_.end(), typesBoost(new_type_form)) != ontology.types_.end()){
          ontology.types_.push_back(new_type_form);
       }
-      new_type = std::distance(ontology.types_.begin(), std::find(ontology.types_.begin(), ontology.types_.end(), new_type_form));
+      new_type = std::distance(ontology.types_.begin(), std::find(ontology.types_.begin(), ontology.types_.end(), typesBoost(new_type_form)));
    }
    type_ = new_type;
 }
@@ -269,10 +259,6 @@ nodeTuple SemanticNode::key(){
    }
    nodeTuple ret = std::make_tuple(type_, category_, is_lambda_, idx_, lambda_name_, is_lambda_instantiation_, c_keys);
    return ret;
-}
-
-size_t SemanticNode::hash(){
-   return tuplehash(key());
 }
 
 static size_t
@@ -327,6 +313,12 @@ tuplehash(const nodeTuple v)
       x = -2;
    return x;
 }
+
+size_t SemanticNode::hash(){
+   return tuplehash(key());
+}
+
+
 
 
 

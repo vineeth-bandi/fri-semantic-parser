@@ -8,6 +8,7 @@ add_executable(main
 main.cpp 
 Ontology.cpp 
 ParseNode.cpp
+SemanticNode.cpp
 )
 
 target_include_directories(main PUBLIC ${Boost_INCLUDE_DIRS}) 
