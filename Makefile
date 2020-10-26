@@ -177,6 +177,33 @@ ParseNode.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/ParseNode.cpp.s
 .PHONY : ParseNode.cpp.s
 
+SemanticNode.o: SemanticNode.cpp.o
+
+.PHONY : SemanticNode.o
+
+# target to build an object file
+SemanticNode.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/SemanticNode.cpp.o
+.PHONY : SemanticNode.cpp.o
+
+SemanticNode.i: SemanticNode.cpp.i
+
+.PHONY : SemanticNode.i
+
+# target to preprocess a source file
+SemanticNode.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/SemanticNode.cpp.i
+.PHONY : SemanticNode.cpp.i
+
+SemanticNode.s: SemanticNode.cpp.s
+
+.PHONY : SemanticNode.s
+
+# target to generate assembly for a file
+SemanticNode.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/SemanticNode.cpp.s
+.PHONY : SemanticNode.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -219,6 +246,9 @@ help:
 	@echo "... ParseNode.o"
 	@echo "... ParseNode.i"
 	@echo "... ParseNode.s"
+	@echo "... SemanticNode.o"
+	@echo "... SemanticNode.i"
+	@echo "... SemanticNode.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
