@@ -260,13 +260,10 @@ std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y){
     std::unordered_map<vvTuple2, int> res;
     std::vector<int> t;
     for (ParseNode* n : y.get_leaves()){
-        t.push_back(n->surface_form_);
+        t.push_back(lex_.surface_forms.at(n->surface_form_));
     }
-    for (int i = 0; i < t.size(); i++){
-        if (t[i] != NULL){
-
-        }
-    }
+    t.insert(0, -2);
+    t.push_back(-3);
     for (int i = 0; i < t.size() - 1; i++){
         key(t[i], t[i+1]);
         auto it = res.find(key);
