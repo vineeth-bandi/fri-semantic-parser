@@ -40,16 +40,18 @@ std::string strip(std::string s) {
     return s;
 }
 
-std::vector<std::string> split(std::string str, std::string sep){
-    char* cstr=const_cast<char*>(str.c_str());
-    char* current;
-    std::vector<std::string> arr;
-    current=strtok(cstr,sep.c_str());
-    while(current!=NULL){
-        arr.push_back(current);
-        current=strtok(NULL,sep.c_str());
+std::vector<std::string> split(std::string str, std::string delimiter){
+    std::string s = std::string(str);
+    size_t pos = 0;
+    std::string token;
+    std::vector<std::string> split_string = std::vector<std::string>();
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(0, pos);
+        split_string.push_back(token);
+        s.erase(0, pos + delimiter.length());
     }
-    return arr;
+    split_string.push_back(s);
+    return split_string;
 }
 
 void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
@@ -383,10 +385,9 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
         //split into two
         std::vector<std::string> lineParts(split(line, " :- ")); 
         std::string lhs = lineParts[0];
-        std::string rhs = lineParts[lineParts.size() -1];
+        std::string rhs = lineParts[1];
         std::string surface_form = strip(lhs);
-
-        std::vector<std::string>::iterator itr = find(surface_forms.begin(), surface_forms.end(), surface_form);
+        auto itr = find(surface_forms.begin(), surface_forms.end(), surface_form);
         size_t sur_idx;
         if(itr != surface_forms.end()){
             sur_idx = (size_t)std::distance(surface_forms.begin(), itr);
@@ -396,7 +397,6 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
             surface_forms.push_back(surface_form);
             entries.push_back(std::vector<int>());
         }
-
         std::vector<boost::variant<int, SemanticNode*>> ret(read_syn_sem(rhs));
         int cat_idx = boost::get<int>(ret[0]);
         SemanticNode* semantic_form = boost::get<SemanticNode *>(ret[1]);
@@ -440,12 +440,9 @@ std::vector<boost::variant<int, SemanticNode *>> Lexicon::read_syn_sem(std::stri
     std::string token;
     std::string lhs;
     std::string rhs;
-    while ((pos = str.find(delimiter)) != std::string::npos) {
-        token = str.substr(0, pos);
-        lhs = token;
-        str.erase(0, pos + delimiter.length());
-    }
-    rhs = str;
+    std::vector<std::string> split_string = split(str, " : ");
+    lhs = split_string[0];
+    rhs = split_string[1];
     int cat_idx = read_category_from_str(strip(lhs));
     std::vector<std::string> scoped;
     SemanticNode *semantic_form = read_semantic_form_from_str(strip(rhs), cat_idx, NULL, scoped);
@@ -643,7 +640,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             } else {
                 e_cat = -1;
             }
-            children.push_back(read_semantic_form_from_str(str_remaining.substr(splits[i - 1] + 1, splits[i] - splits[i-1]), e_cat, node, scoped_lambdas));
+            children.push_back(read_semantic_form_from_str(str_remaining.substr(splits[i - 1] + 1, splits[i] - (splits[i-1] + 1)), e_cat, node, scoped_lambdas));
         }
         node->children_ = children;
     }
