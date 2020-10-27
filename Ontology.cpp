@@ -14,7 +14,7 @@ int Ontology::calc_num_pred_args(int idx)
 void Ontology::read_sem_fromfile(std::string fname)
 {
     preds_.push_back("*and");
-    entries_.push_back(Ontology::read_type_from_str("'<*,<*,*>>", true));
+    entries_.push_back(Ontology::read_type_from_str("<*,<*,*>>", true));
     std::ifstream file;
     file.open(fname);
     if (!file)
