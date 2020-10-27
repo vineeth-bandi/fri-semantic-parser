@@ -32,26 +32,24 @@ bool readFile(std::string fileName, std::vector<std::string>&fileVec){
 }
 
 std::string strip(std::string s) {
-    size_t first = s.find_first_not_of(' ');
-    if (string::npos == first)
-    {
-        return s;
-    }
-    size_t last = s.find_last_not_of(' ');
-    return s.substr(first, (last - first + 1));
+    std::size_t start = s.find_first_not_of(WHITESPACE);
+        std::size_t end = s.find_last_not_of(WHITESPACE);
+        if(start == std::string::npos  || end  == std::string::npos)
+            return std::string("");
+        s = s.substr(start, end - start + 1 > 0 ? end - start + 1 : 0);
+    return s;
 }
 
-std::vector<std::string> split(std::string in, std::string delimiter){
-    std::string input = in;
-    std::vector<std::string> splitList;
-    size_t pos = 0;
-    std::string token;
-    while ((pos = input.find(delimiter)) != std::string::npos) {
-        token = input.substr(0, pos);
-        splitList.push_back(token);
-        input.erase(0, pos + delimiter.length());
+std::vector<std::string> split(std::string str, std::string sep){
+    char* cstr=const_cast<char*>(str.c_str());
+    char* current;
+    std::vector<std::string> arr;
+    current=strtok(cstr,sep.c_str());
+    while(current!=NULL){
+        arr.push_back(current);
+        current=strtok(NULL,sep.c_str());
     }
-    return splitList;
+    return arr;
 }
 
 void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
@@ -382,7 +380,6 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
         std::string line = *it;
         line = strip(line);
         if (line.length() == 0 || line[0] == '#') continue;
-
         //split into two
         std::vector<std::string> lineParts(split(line, " :- ")); 
         std::string lhs = lineParts[0];

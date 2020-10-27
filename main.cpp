@@ -1,6 +1,7 @@
 #include "ParseNode.h"
 #include "Ontology.h"
 #include "SemanticNode.h"
+#include "Lexicon.h"
 int main(int argc, char **argv){
     ParseNode x(nullptr, nullptr);
     ParseNode y(&x, nullptr);
@@ -33,6 +34,6 @@ int main(int argc, char **argv){
     std::cout << child1->hash() << std::endl;
 
     parent1->increment_lambdas();
-    
+    Lexicon* test = new Lexicon(&ont, "lex.txt", "matrix.csv", "dict.csv");
     return 0;
 }
