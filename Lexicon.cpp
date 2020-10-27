@@ -277,11 +277,16 @@ std::vector<int[2]> Lexicon::find_consumables_for_cat(int idx) {
             }
             curr = categories[temp[0]];
         } 
-        if (curr.type() == typeid(std::vector<int>) && boost::get<std::vector<int>>(curr)[0] == idx) {
-            int cons[2] = {boost::get<std::vector<int>>(curr)[1], boost::get<std::vector<int>>(curr)[2]};
-            // check this "if cons not in consumables:"
-            if (!(std::find(consumables.begin(), consumables.end(), cons) != consumables.end())) {
-                consumables.push_back(cons);
+        if (curr.type() == typeid(std::vector<int>)) {
+            std::vector<int> temp = boost::get<std::vector<int>>(curr);
+            if(temp[0] == idx){
+                int cons[2];
+                cons[0] = temp[1];
+                cons[1] = temp[2];
+                // check this "if cons not in consumables:"
+                if (!(std::find(consumables.begin(), consumables.end(), cons) != consumables.end())) {
+                    consumables.push_back(cons);
+                }
             }
         }
     }
@@ -290,8 +295,8 @@ std::vector<int[2]> Lexicon::find_consumables_for_cat(int idx) {
 
 // c in self categories?
 int Lexicon::get_or_add_category(boost::variant<std::vector<int>, std::string> c){
-    if (!(std::find(categories.begin(), categories.end(), c) != categories.end())) {
-        auto it = find(categories.begin(), categories.end(), c); 
+    if (!(std::find(categories.begin(), categories.end(), boost::variant<std::string, std::vector<int>>(c)) != categories.end())) {
+        auto it = find(categories.begin(), categories.end(), boost::variant<std::string, std::vector<int>>(c)); 
         // If element was found 
         if (it != categories.end()) { 
         // calculating the index 
@@ -616,7 +621,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             else if (str_remaining[i] == '<') {
                 d += 1;
             }
-            else if str_remaining[i] == '>') {
+            else if (str_remaining[i] == '>') {
                 d -= 1;
             }
             else if (str_remaining[i] == ',' && p == 0 && d == 0) {
@@ -630,16 +635,16 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
         splits.push_back(str_remaining.length());
         std::vector<int> expected_child_cats;
         int curr_cat = category;
-        while (curr_cat != NULL && categories[curr_cat].type() == typeid(std::vector<int>)) {
-            curr_cat = categories[curr_cat][0];
+        while (curr_cat != -1 && categories[curr_cat].type() == typeid(std::vector<int>)) {
+            curr_cat = boost::get<std::vector<int>>(categories[curr_cat])[0];
             expected_child_cats.push_back(curr_cat);
         }
-        for (int i = 1; i < splits.length(); i++) {
+        for (int i = 1; i < splits.size(); i++) {
             int e_cat;
             if (expected_child_cats.size() >= i) {
                 e_cat = expected_child_cats[i - 1];
             } else {
-                e_cat = NULL;
+                e_cat = -1;
             }
             children.push_back(read_semantic_form_from_str(str_remaining.substr(splits[i - 1] + 1, splits[i] - splits[i-1]), e_cat, node, scoped_lambdas));
         }
@@ -653,7 +658,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
         //     sys.exit("Offending string: '" + s + "'")
 
 
-    node->set_return_type(ontology);
+    node->set_return_type(*ontology);
 
 
     if (!node->validate_tree_structure()) {
@@ -687,7 +692,7 @@ SemanticNode *Lexicon::instantiate_wild_type(SemanticNode *root){
         }
         root->type_ = ontology->read_type_from_str("<" + crta + ",<" + crta + "," + crta + ">>");
     }
-    if (root->children_ != NULL) {
+    if (root->children_.size() != 0) {
         for (int cidx = 0; cidx < root->children_.size(); cidx++) {
             root->children_[cidx] = instantiate_wild_type(root->children_[cidx]);
         }
@@ -729,22 +734,21 @@ void Lexicon::delete_semantic_form_for_surface_form(SemanticNode *surface_form, 
 
     // check if iterator erase equivalent to Python .remove
     if ((std::find(entries.begin(), entries.end(), sur_idx) != entries.end())) {
-        if ((std::find(entries[sur_idx].begin(), entries[sur_idx].end(), sem_idx) != entries[sur_idx].end())) {
-            entries[sur_idx].remove(entries[sur_idx].begin(), entries[sur_idx].end(), sem_idx);
+        if (std::find(entries[sur_idx].begin(), entries[sur_idx].end(), sem_idx) != entries[sur_idx].end()) {
+            entries[sur_idx].erase(std::find(entries[sur_idx].begin(), entries[sur_idx].end(), sem_idx));
         }
     }
 
     if ((std::find(pred_to_surface.begin(), pred_to_surface.end(), ont_idx) != pred_to_surface.end())) {
-        if ((std::find(pred_to_surface[ont_idx].begin(), pred_to_surface[ont_idx].end(), sur_idx) != pred_to_surface[ont_idx].end())) {
+        if ((std::find(pred_to_surface[ont_idx].begin(), pred_to_surface[ont_idx].end(), sur_idx)) != pred_to_surface[ont_idx].end()) {
             // del self.pred_to_surface[sur_idx] ??? dictionary
-            it = pred_to_surface.find(sur_idx);             
-            pred_to_surface.erase (it);
+            pred_to_surface.erase (sur_idx);
         }
     }
 
     if ((std::find(reverse_entries.begin(), reverse_entries.end(), sem_idx) != reverse_entries.end())) {
-        if ((std::find(reverse_entries[sem_idx].begin(), reverse_entries[sem_idx].end(), sur_idx) != reverse_entries[sem_idx].end())) {
-            reverse_entries.remove(reverse_entries.begin(), reverse_entries.end(), sur_idx);
+        if ((std::find(reverse_entries[sem_idx].begin(), reverse_entries[sem_idx].end(), sur_idx)) != reverse_entries[sem_idx].end()) {
+            reverse_entries.erase(std::find(reverse_entries.begin(), reverse_entries.end(), sur_idx));
         }
     }
 }
