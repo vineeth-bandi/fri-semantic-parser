@@ -263,9 +263,9 @@ int Lexicon::calc_return_cat(int idx){
 }
 
 // check return type
-std::vector<int[2]> Lexicon::find_consumables_for_cat(int idx) {
+std::vector<std::tuple<int, int>> Lexicon::find_consumables_for_cat(int idx) {
     // list of list of int or just string
-    std::vector<int[2]> consumables;
+    std::vector<std::tuple<int, int>> consumables;
     for (SemanticNode* sem_form : semantic_forms) {
         //boost
         boost::variant<std::string, std::vector<int>> curr = categories[sem_form->category_];
@@ -280,9 +280,7 @@ std::vector<int[2]> Lexicon::find_consumables_for_cat(int idx) {
         if (curr.type() == typeid(std::vector<int>)) {
             std::vector<int> temp = boost::get<std::vector<int>>(curr);
             if(temp[0] == idx){
-                int cons[2];
-                cons[0] = temp[1];
-                cons[1] = temp[2];
+                std::tuple<int, int> cons = std::tuple<int, int>(temp[1], temp[2]);
                 // check this "if cons not in consumables:"
                 if (!(std::find(consumables.begin(), consumables.end(), cons) != consumables.end())) {
                     consumables.push_back(cons);
@@ -331,7 +329,7 @@ std::string Lexicon::compose_str_from_category(int idx){
 }
 
 // find return type
-std::vector<int> Lexicon::get_semantic_forms_for_surface_form(std::vector<SemanticNode *> surface_form){
+std::vector<int> Lexicon::get_semantic_forms_for_surface_form(std::string surface_form){
     if (!(std::find(surface_forms.begin(), surface_forms.end(), surface_form) != surface_forms.end())) {
         return std::vector<int>();
     } else {
@@ -351,13 +349,15 @@ std::vector<int> Lexicon::get_semantic_forms_for_surface_form(std::vector<Semant
 
 std::vector<int> Lexicon::get_surface_forms_for_predicate(boost::variant<std::string, int> pred){
     if (pred.type() == typeid(std::string)) {
-        std::vector<std::string>::iterator it;
-        if (std::find(ontology -> preds_.begin(), ontology -> preds_.end(), pred) != ontology -> preds_.end()){
-            return pred_to_surface[std::distance(ontology -> preds_.begin(), it)];
+        typesBoost temp = boost::get<std::string>(pred);
+        int indx = ontology->find_index(temp);
+        if ( indx != -1){
+            return pred_to_surface[indx];
         }
     }
     else{
         if (pred_to_surface.find(boost::get<int>(pred)) != pred_to_surface.end()){
+            
             return pred_to_surface[boost::get<int>(pred)];
         }
     }
@@ -426,7 +426,7 @@ void Lexicon::expand_lex_from_strs(std::vector<std::string> lines){
 
         // another version.
         for (int pred : preds_in_semantic_form) {
-            if ((std::find(pred_to_surface.begin(), pred_to_surface.end(), pred) != pred_to_surface.end())) {
+            if (pred_to_surface.find(pred) != pred_to_surface.end()) {
                 pred_to_surface[pred].push_back(sur_idx);
             } else {
                 pred_to_surface[pred] = std::vector<int>{(int)sur_idx};
@@ -700,7 +700,7 @@ SemanticNode *Lexicon::instantiate_wild_type(SemanticNode *root){
     return root;
 }
 
-void Lexicon::delete_semantic_form_for_surface_form(SemanticNode *surface_form, int ont_idx){
+/* void Lexicon::delete_semantic_form_for_surface_form(std::string surface_form, int ont_idx){
     if (!(std::find(surface_forms.begin(), surface_forms.end(), surface_form) != surface_forms.end())) {
         return;
     }
@@ -717,20 +717,10 @@ void Lexicon::delete_semantic_form_for_surface_form(SemanticNode *surface_form, 
 
     int sur_idx = 0;
     auto it = find(surface_forms.begin(), surface_forms.end(), surface_form); 
-    // If element was found 
-    if (it != surface_forms.end()) { 
-    // calculating the index 
-    // of K 
-        sur_idx = distance(surface_forms.begin(), it); 
-    }
+    sur_idx = distance(surface_forms.begin(), it); 
     int sem_idx = 0;
-    it = find(surface_forms.begin(), surface_forms.end(), matching_semantic_form); 
-    // If element was found 
-    if (it != surface_forms.end()) { 
-    // calculating the index 
-    // of K 
-        sem_idx = distance(surface_forms.begin(), it); 
-    }
+    auto itr = find(semantic_forms.begin(), semantic_forms.end(), matching_semantic_form); 
+    sem_idx = distance(semantic_forms.begin(), itr); 
 
     // check if iterator erase equivalent to Python .remove
     if ((std::find(entries.begin(), entries.end(), sur_idx) != entries.end())) {
@@ -751,4 +741,4 @@ void Lexicon::delete_semantic_form_for_surface_form(SemanticNode *surface_form, 
             reverse_entries.erase(std::find(reverse_entries.begin(), reverse_entries.end(), sur_idx));
         }
     }
-}
+} */

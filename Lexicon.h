@@ -22,10 +22,10 @@ public:
 	std::vector<std::string> surface_forms;
 	std::vector<SemanticNode *> semantic_forms;
 	std::vector<std::vector<int>> reverse_entries;
-	std::vector<std::string> neighbor_surface_forms;
+	std::vector<int> neighbor_surface_forms;
 	std::vector<int> sem_form_expected_args;
 	std::vector<int> sem_form_return_cat;
-	std::vector<std::vector<int[2]>> category_consumes;
+	std::vector<std::vector<std::tuple<int, int>>> category_consumes;
 	bool generator_should_flush;
 	bool sem_form_expected;
 	Eigen::MatrixXd wv;
@@ -37,10 +37,10 @@ public:
 	std::vector<std::vector<int>> compute_reverse_entries();
 	int calc_exp_args(int idx);
 	int calc_return_cat(int idx);
-	std::vector<int[2]> find_consumables_for_cat(int idx);
+	std::vector<std::tuple<int, int>> find_consumables_for_cat(int idx);
 	int get_or_add_category(boost::variant<std::vector<int>, std::string> c);
 	std::string compose_str_from_category(int idx);
-	std::vector<int> get_semantic_forms_for_surface_form(std::vector<SemanticNode *> surface_form);
+	std::vector<int> get_semantic_forms_for_surface_form(std::string surface_form);
 	std::vector<int> get_surface_forms_for_predicate(boost::variant<std::string, int> pred);
 	void read_lex_from_file(std::string fname);
 	void expand_lex_from_strs(std::vector<std::string> lines);
@@ -49,5 +49,5 @@ public:
 	int read_category_from_str(std::string s);
 	SemanticNode *read_semantic_form_from_str(std::string s, int category, SemanticNode *parent, std::vector<std::string> scoped_lambdas);
 	SemanticNode *instantiate_wild_type(SemanticNode *root);
-	void delete_semantic_form_for_surface_form(SemanticNode * surface_form, int ont_idx);
+	/* void delete_semantic_form_for_surface_form(std::string surface_form, int ont_idx); */
 };
