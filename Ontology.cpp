@@ -11,6 +11,7 @@ int Ontology::calc_num_pred_args(int idx)
     }
     return num_args;
 }
+
 void Ontology::read_sem_fromfile(std::string fname)
 {
     preds_.push_back("*and");
@@ -34,12 +35,11 @@ void Ontology::read_sem_fromfile(std::string fname)
         line = line.substr(start, end - start + 1 > 0 ? end - start + 1 : 0);
         if (line.length() == 0 || line[0] == '#')
             continue;
-        std::string intermediate;
-        std::stringstream token_stream(line);
-        std::getline(token_stream, intermediate, ':');
-        std::string name = intermediate;
-        std::getline(token_stream, intermediate, ':');
-        std::string type_str = intermediate;
+        boost::char_separator<char> sep(":");
+        boost::tokenizer<boost::char_separator<char>> tok(line, sep);
+        auto itr = tok.begin();
+        std::string name = std::string(*(itr));
+        std::string type_str =  std::string(*(++itr));
         auto loc = std::find(preds_.begin(), preds_.end(), name);
         if (loc != preds_.end())
         {
@@ -53,11 +53,11 @@ void Ontology::read_sem_fromfile(std::string fname)
 }
 int Ontology::read_type_from_str(std::string s, bool allow_wild)
 {
-    if (s[0] == '<' && s[s.size() - 1] == '>')
+    if (s[0] == '<' && s[s.length() - 1] == '>')
     {
         int d = 0;
         int split_idx = 1;
-        for (; split_idx < s.size() - 1; split_idx++)
+        for (; split_idx < s.length() - 1; split_idx++)
         {
             if (s[split_idx] == '<')
                 d += 1;
@@ -89,7 +89,7 @@ int Ontology::read_type_from_str(std::string s, bool allow_wild)
         types_.push_back(str);
         index = types_.size() - 1;
     }
-    if (!allow_wild && !s.compare("*"))
+    if (!allow_wild && s == "*")
     {
         std::cerr << "The * types only has internal support" << std::endl;
         exit(0);
@@ -127,11 +127,12 @@ bool Ontology::types_equal(int tidx, int tjdx)
 }
 int Ontology::find_index(typesBoost x)
 {
-    int c = 0;
-    for(auto it = types_.begin(); it != types_.end(); ++it, c++)
-        if(x == *it)
-            return c;
-    return -1;
+    auto it = std::find(types_.begin(), types_.end(), x);
+    if(it == types_.end())
+        return -1;
+    else
+        return std::distance(types_.begin(), it);
+    
 }
 
 Ontology::Ontology(std::string ont_fname)

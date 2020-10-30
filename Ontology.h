@@ -8,7 +8,7 @@
 #include <fstream>
 #include <algorithm>
 #include <bits/stdc++.h>
-
+#include <boost/tokenizer.hpp>
 const std::string WHITESPACE = " \n\r\t\f\v";
 typedef boost::variant<std::string, std::vector<int>> typesBoost;
 class Ontology
