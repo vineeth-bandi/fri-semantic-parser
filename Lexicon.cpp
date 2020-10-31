@@ -32,11 +32,7 @@ bool readFile(std::string fileName, std::vector<std::string>&fileVec){
 }
 
 std::string strip(std::string s) {
-    std::size_t start = s.find_first_not_of(WHITESPACE);
-        std::size_t end = s.find_last_not_of(WHITESPACE);
-        if(start == std::string::npos  || end  == std::string::npos)
-            return std::string("");
-        s = s.substr(start, end - start + 1 > 0 ? end - start + 1 : 0);
+    boost::trim(s);
     return s;
 }
 
@@ -45,7 +41,8 @@ std::vector<std::string> split(std::string str, std::string delimiter){
     size_t pos = 0;
     std::string token;
     std::vector<std::string> split_string = std::vector<std::string>();
-    while ((pos = s.find(delimiter)) != std::string::npos) {
+    while ((pos = s.find(delimiter)) != std::string::npos)
+    {
         token = s.substr(0, pos);
         split_string.push_back(token);
         s.erase(0, pos + delimiter.length());
@@ -53,7 +50,6 @@ std::vector<std::string> split(std::string str, std::string delimiter){
     split_string.push_back(s);
     return split_string;
 }
-
 void Lexicon::load_word_embeddings(std::string fn, std::string fn2)
 {
    if (fn != "" && fn2 != "")

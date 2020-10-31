@@ -26,13 +26,7 @@ void Ontology::read_sem_fromfile(std::string fname)
     std::string line;
     while (std::getline(file, line))
     {
-        std::size_t start = line.find_first_not_of(WHITESPACE);
-        std::size_t end = line.find_last_not_of(WHITESPACE);
-
-        if(start == std::string::npos  || end  == std::string::npos)
-            continue;
-
-        line = line.substr(start, end - start + 1 > 0 ? end - start + 1 : 0);
+        boost::trim(line);
         if (line.length() == 0 || line[0] == '#')
             continue;
         boost::char_separator<char> sep(":");

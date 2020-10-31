@@ -10,6 +10,9 @@
 #include <fstream>
 #include <unordered_map>
 #include <Eigen/Dense>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 class Lexicon
 {
 
