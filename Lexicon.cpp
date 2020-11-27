@@ -480,8 +480,7 @@ int Lexicon::read_category_from_str(std::string s){
                 break;
             }
         }
-        if (i == s.length() - 2 && p == 1 && s[s.length() - 1] == ')') {
-            cout << "<1>" << endl;
+        if (i == s.length() - 1 && p == 1 && s[s.length() - 1] == ')') {
             s = s.substr(1, s.length() - 2);
         }
     }
@@ -506,9 +505,7 @@ int Lexicon::read_category_from_str(std::string s){
     }
     boost::variant<std::string, std::vector<int>> category;
     if (fin_slash_idx > 0) {
-        cout << "<2>" << endl;
         int output_category_idx = read_category_from_str(s.substr(0, fin_slash_idx));
-        cout << "<3>" << endl;
         int input_category_idx = read_category_from_str(s.substr(fin_slash_idx + 1, s.length() - (fin_slash_idx + 1)));
         std::vector<int> temp;
         temp.push_back(output_category_idx);
@@ -539,9 +536,7 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
     SemanticNode *node;
     std::string str_remaining;
     bool is_scoped_lambda = false;
-    cout << "<4>" << endl;
     if(s.substr(0, 6) == "lambda") {
-        cout << "<5>" << endl;
         std::vector<std::string> str_parts = split(strip(s.substr(6, s.length() - 6)), ".");
         std::string info = str_parts[0];
         std::vector<std::string> name_type = split(info, ":");
@@ -557,7 +552,6 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
                 str_remaining += '.';
             }
         }
-        cout << "<6>" << endl;
         str_remaining = str_remaining.substr(1, str_remaining.length() - 2);
     } else {
         int end_of_pred = 1;
@@ -567,7 +561,6 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             }
             end_of_pred += 1;
         }
-        cout << "<7>" << endl;
         std::string pred = s.substr(0, end_of_pred);
 
         SemanticNode *curr = parent;
@@ -602,9 +595,6 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             }
             node = new SemanticNode(parent, ontology->entries_[pred_idx], category, pred_idx);
         }
-        cout << "<8>" << endl;
-        cout << s << endl;
-        cout << end_of_pred << endl;
         if(end_of_pred < s.length()-1){
             str_remaining = s.substr(end_of_pred + 1, s.length() - (end_of_pred + 2));
         }
@@ -613,7 +603,6 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             str_remaining = "";
         }
     }
-    cout << str_remaining.length() << endl;
     if (str_remaining.length() > 0) {
         std::vector<int> delineating_comma_idxs;
         int p = 0;
@@ -653,7 +642,6 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
             } else {
                 e_cat = -1;
             }
-            cout << "<9>" << endl;
             children.push_back(read_semantic_form_from_str(str_remaining.substr(splits[i - 1] + 1, splits[i] - (splits[i-1] + 1)), e_cat, node, scoped_lambdas));
         }
         node->children_ = children;
@@ -667,12 +655,10 @@ SemanticNode* Lexicon::read_semantic_form_from_str(std::string s, int category, 
 
 
     node->set_return_type(*ontology);
-
     if (!node->validate_tree_structure()) {
         std::cout << "ERROR: read in invalidly linked semantic node from string '" << s << "'";
         exit (EXIT_FAILURE);
     }
-
     node = instantiate_wild_type(node);
     return node;
 

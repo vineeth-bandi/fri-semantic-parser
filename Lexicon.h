@@ -29,10 +29,10 @@ public:
 	std::vector<int> sem_form_expected_args;
 	std::vector<int> sem_form_return_cat;
 	std::vector<std::vector<std::tuple<int, int>>> category_consumes;
+	std::unordered_map<std::string, int> vocab;
+	Eigen::MatrixXd wv;
 	bool generator_should_flush;
 	bool sem_form_expected;
-	Eigen::MatrixXd wv;
-	std::unordered_map<std::string, int> vocab;
 	void load_word_embeddings(std::string fn, std::string fn2);
 	std::vector<std::tuple<int, double>> get_lexicon_word_embedding_neighbors(std::string w, int n); // nalin
 	void update_support_structures();

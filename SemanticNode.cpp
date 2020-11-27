@@ -5,14 +5,14 @@ SemanticNode::SemanticNode(SemanticNode *parent, int type, int category, int idx
 {
    is_lambda_ = false;
    is_lambda_instantiation_ = false;
-   lambda_name_ = 0;
+   lambda_name_ = -1;
    categories_used_.push_back(idx_);
 }
 
 SemanticNode::SemanticNode(SemanticNode *parent, int type, int category, int lambda_name, bool is_lambda_instantiation, std::vector<SemanticNode *> children) : parent_(parent), type_(type), category_(category), lambda_name_(lambda_name), is_lambda_instantiation_(is_lambda_instantiation), children_(children)
 {
    is_lambda_ = true;
-   idx_ = 0;
+   idx_ = -1;
 }
 
 SemanticNode::SemanticNode(SemanticNode &a): type_(a.type_), category_(a.category_), lambda_name_(a.lambda_name_), is_lambda_(a.is_lambda_), is_lambda_instantiation_(a.is_lambda_instantiation_), idx_(a.idx_){
