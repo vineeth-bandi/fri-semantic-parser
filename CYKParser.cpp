@@ -270,7 +270,98 @@ std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y){
         if (it == res.end()){
             res[key] = 0;
         }
-        res[key] += 1;
+        res[key]++;
     }
     return res;
+}
+
+// need to change so that it can handle lambda, should be easy fix
+std::unordered_map<tuple3, int> count_semantics(boostNode sn){
+    if (sn.type() == typeid(ParseNode)){
+        sn = *sn.node_;
+    }
+
+    std::unordered_map<tuple3, int> counts;
+    if (sn.children_.size() > 0){
+        int pred = sn.idx_;
+        for (int i = 0; i < sn.children_.size(); i++){
+            int arg = sn.children_[pos]->idx_;
+            tuple3 key(pred, arg, pos);
+            if (counts.find(key) == counts.end()){
+                counts[key] = 0;
+            }
+            counts[key]++;
+        }
+        for (int i = 0; i < sn.children_.size(); i++){
+            std::unordered_map<tuple3, int> child_counts = count_semantics(*sn.children_[i]);
+            for(auto const& pair : child_counts) {
+                auto it = counts.find(pair.first);
+                if (it == counts.end()){
+                    counts[pair.first] = 0;
+                }
+                counts[pair.first] += child_counts[pair.first];
+            }
+        }
+    }
+    return counts;
+}
+
+void update_learned_parameters(std::vector<boostT> t){
+
+}
+
+//need to fix because surface form is a string not a vector of int
+std::unordered_map<vvTuple2, int> count_lexical_entries(ParseNode y){
+    std::unordered_map<vvTuple2, int> pairs;
+    std::vector<ParseNode *> token_assignments = y.get_leaves();
+    for (int i = 0; i < token_assignments.size(); i++){
+        vvTuple2 key(token_assignments[i]->surface_form_, token_assignments[i]->semantic_form_);
+        auto it = pairs.find(key);
+        if (it == pairs.end()){
+            pairs[key] = 0;
+        }
+        pairs[key]++;
+    }
+    return pairs;
+}
+
+std::unordered_map<tuple3, int> count_ccg_productions(ParseNode y){
+    std::unordered_map<tuple3, int> productions;
+    std::vector<ParseNode> to_explore;
+    to_explore.push_back(y);
+    while(to_explore.size() > 0){
+        ParseNode n = to_explore.back();
+        to_explore.pop_back();
+        if (n.children_.size() > 0){
+            tuple3 key(n.node->category_, n.children[0]->category_, n.children[1]->category_);
+            if (productions.find(key) == productions.end())
+                productions[key] = 0;
+            productions[key]++;
+            to_explore.reserve(to_explore.size() + n.children_.size());
+            for (int i = 0; i < n.children_.size(); i++){
+                to_explore.push_back(*n.children_[i]);
+            }
+        }
+    }
+    return productions;
+}
+
+std::unordered_map<int, int> count_ccg_root(ParseNode y){
+    std::unordered_map<int, int> root;
+    root[y.node->category_] = 1;
+    return root;
+}
+
+std::unordered_map<ivTuple2, int> count_ccg_surface_form_pairs(ParseNode y){
+    std::unordered_map<ivTuple2, int> pairs;
+    std::vector<ParseNode *> token_assignments = y.get_leaves();
+    for (int i = 0; i < token_assignments.size(); i++){
+        vvTuple2 key(token_assignments[i]->category_, token_assignments[i]->surface_form_);
+        auto it = pairs.find(key);
+        if (it == pairs.end()){
+            pairs[key] = 0;
+        }
+        pairs[key]++;
+    }
+    return pairs;
 }
