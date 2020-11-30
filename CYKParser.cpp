@@ -276,24 +276,32 @@ std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y){
 }
 
 // need to change so that it can handle lambda, should be easy fix
-std::unordered_map<tuple3, int> count_semantics(boostNode sn){
+std::unordered_map<ltuple3, int> count_semantics(boostNode sn){
     if (sn.type() == typeid(ParseNode)){
         sn = *sn.node_;
     }
 
-    std::unordered_map<tuple3, int> counts;
+    std::unordered_map<ltuple3, int> counts;
     if (sn.children_.size() > 0){
-        int pred = sn.idx_;
+        lambda pred = sn.idx_;
+        if (sn.is_lambda_)
+            if (sn.is_lambda_instantiation_)
+                pred = "lambda_inst";
+            else pred = "lambda"
         for (int i = 0; i < sn.children_.size(); i++){
             int arg = sn.children_[pos]->idx_;
-            tuple3 key(pred, arg, pos);
+            if (sn.children_[pos]->is_lambda_)
+                if (sn.children_[pos]->is_lambda_instantiation_)
+                    arg = "lambda_inst";
+                else arg = "lambda"
+            ltuple3 key(pred, arg, pos);
             if (counts.find(key) == counts.end()){
                 counts[key] = 0;
             }
             counts[key]++;
         }
         for (int i = 0; i < sn.children_.size(); i++){
-            std::unordered_map<tuple3, int> child_counts = count_semantics(*sn.children_[i]);
+            std::unordered_map<ltuple3, int> child_counts = count_semantics(*sn.children_[i]);
             for(auto const& pair : child_counts) {
                 auto it = counts.find(pair.first);
                 if (it == counts.end()){

@@ -13,12 +13,14 @@ std::string lex_fname = "lex.txt";
 
 typedef std::tuple<int, int> tuple2;
 typedef std::tuple<int, int, int> tuple3;
+typedef std::tuple<lambda, int, int> ltuple3;
 typedef std::tuple<std::vector<int>, std::vector<int>> vvTuple2;
 typedef std::tuple<std::string, std::vector<int>> svTuple2;
 typedef std::tuple<int, std::vector<int>> ivTuple2;
 typedef std::tuple<std::string, SemanticNode> dTuple;
 typedef std::tuple<std::string, ParseNode, ParseNode, std::vector<std::vector<int>>, std::vector<std::vector<int>>, std::vector<std::string>, std::vector<std::string>> tupleTP;
 typedef boost::variant<SemanticNode, ParseNode> boostNode;
+typedef boost::variant<std::string, int> lambda;
 typedef boost::variant<int, std::string, SemanticNode> lex_entries;
 typedef boost::variant<std::string, ParseNode, std::vector<std::vector<lex_entries>>, std::vector<std::string>> boostT;
 
@@ -51,7 +53,7 @@ public:
     std::unordered_map<tuple2, double> init_lexicon_entry(double lexicon_weight);
     double get_semantic_score(ParseNode n);
     std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y);
-    std::unordered_map<tuple3, int> count_semantics(boostNode sn);
+    std::unordered_map<ltuple3, int> count_semantics(boostNode sn);
     void update_learned_parameters(std::vector<boostT> t);
     std::unordered_map<svTuple2, int> count_lexical_entries(ParseNode y);
     std::unordered_map<tuple3, int> count_ccg_productions(ParseNode y);
