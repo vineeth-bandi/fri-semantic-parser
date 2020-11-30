@@ -310,9 +310,8 @@ void update_learned_parameters(std::vector<boostT> t){
 
 }
 
-//need to fix because surface form is a string not a vector of int
-std::unordered_map<vvTuple2, int> count_lexical_entries(ParseNode y){
-    std::unordered_map<vvTuple2, int> pairs;
+std::unordered_map<svTuple2, int> count_lexical_entries(ParseNode y){
+    std::unordered_map<svTuple2, int> pairs;
     std::vector<ParseNode *> token_assignments = y.get_leaves();
     for (int i = 0; i < token_assignments.size(); i++){
         vvTuple2 key(token_assignments[i]->surface_form_, token_assignments[i]->semantic_form_);

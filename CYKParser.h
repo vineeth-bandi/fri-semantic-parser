@@ -14,6 +14,7 @@ std::string lex_fname = "lex.txt";
 typedef std::tuple<int, int> tuple2;
 typedef std::tuple<int, int, int> tuple3;
 typedef std::tuple<std::vector<int>, std::vector<int>> vvTuple2;
+typedef std::tuple<std::string, std::vector<int>> svTuple2;
 typedef std::tuple<int, std::vector<int>> ivTuple2;
 typedef std::tuple<std::string, SemanticNode> dTuple;
 typedef std::tuple<std::string, ParseNode, ParseNode, std::vector<std::vector<int>>, std::vector<std::vector<int>>, std::vector<std::string>, std::vector<std::string>> tupleTP;
@@ -52,7 +53,7 @@ public:
     std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y);
     std::unordered_map<tuple3, int> count_semantics(boostNode sn);
     void update_learned_parameters(std::vector<boostT> t);
-    std::unordered_map<vvTuple2, int> count_lexical_entries(ParseNode y);
+    std::unordered_map<svTuple2, int> count_lexical_entries(ParseNode y);
     std::unordered_map<tuple3, int> count_ccg_productions(ParseNode y);
     std::unordered_map<int, int> count_ccg_root(ParseNode y);
     std::unordered_map<ivTuple2, int> count_ccg_surface_form_pairs(ParseNode y);
