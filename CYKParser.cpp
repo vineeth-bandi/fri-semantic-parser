@@ -265,7 +265,7 @@ std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y){
     t.insert(0, -2);
     t.push_back(-3);
     for (int i = 0; i < t.size() - 1; i++){
-        key(t[i], t[i+1]);
+        tuple2 key(t[i], t[i+1]);
         auto it = res.find(key);
         if (it == res.end()){
             res[key] = 0;
@@ -275,12 +275,10 @@ std::unordered_map<vvTuple2, int> count_token_bigrams(ParseNode y){
     return res;
 }
 
-// need to change so that it can handle lambda, should be easy fix
 std::unordered_map<ltuple3, int> count_semantics(boostNode sn){
     if (sn.type() == typeid(ParseNode)){
         sn = *sn.node_;
     }
-
     std::unordered_map<ltuple3, int> counts;
     if (sn.children_.size() > 0){
         lambda pred = sn.idx_;
@@ -314,8 +312,116 @@ std::unordered_map<ltuple3, int> count_semantics(boostNode sn){
     return counts;
 }
 
+// TODO: instead of searching if not in list then finding index just find index or append
 void update_learned_parameters(std::vector<boostT> t){
+    double lr = 1.0 / sqrt(t.size());
 
+    for (int i = 0; i < t.size(); i += 7){
+        auto x = t[i]; // string?
+        auto y = t[i+1]; //ParseNode?
+        auto z = t[i+2]; // same
+        auto y_lex = t[i+3]; //vectors of lexion entries
+        auto z_lex = t[i+4]; //this too
+        auto y_skipped = t[i+5]; // if it matters i think this is a vector of strings
+        auto z_skipped = t[i+6]; // same for this
+        for (int j = 0; j < y_skipped.size(); j++){
+            auto y_key = y_skipped[j];
+            if (std::find(z_skipped.begin(), z_skipped.end(), y_key) == z_skipped.end()){
+                if (std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), y_key) == lex_.surface_forms.end()){
+                    lex_.surface_forms.push_back(y_key);
+                    std::vector<int> blank;
+                    lex_.entries.push_back(blank);
+                }
+            }
+            int y_sidx = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), y_key) - lex_.surface_forms.begin();
+            if (_skipwords_given_surface_form.find(y_sidx) == _skipwords_given_surface_form.end())
+                _skipwords_given_surface_form[y_sidx] = 0;
+            _skipwords_given_surface_form[y_sidx] -= lr
+            }
+        }
+        for (int j = 0; j < z_skipped.size(); j++){
+            auto z_key = z_skipped[j];
+            if (std::find(y_skipped.begin(), y_skipped.end(), z_key) == y_skipped.end()){
+                if (std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), z_key) == lex_.surface_forms.end()){
+                    lex_.surface_forms.push_back(z_key);
+                    std::vector<int> blank;
+                    lex_.entries.push_back(blank);
+                }
+            }
+            int z_sidx = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), z_key) - lex_.surface_forms.begin();
+            if (_skipwords_given_surface_form.find(z_sidx) == _skipwords_given_surface_form.end())
+                _skipwords_given_surface_form[z_sidx] = 0;
+            _skipwords_given_surface_form[z_sidx] -= lr
+            }
+        }
+
+        ParseNode form = y;
+        for (int j = 0; j < y_lex.size(); j += 2){
+            lex_entries surface_form = y_lex[j];
+            SemanticNode sem_node = y_lex[j+1];
+            if (surface_form.type() == typeid(std::string) && std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), surface_form) == lex_.surface_forms.end())
+                lex_.surface_forms.push_back(surface_form);
+            int sf_idx = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), surface_form) - lex_.surface_forms.begin();
+            if (_skipwords_given_surface_form.find(sf_idx) == _skipwords_given_surface_form.end())
+                _skipwords_given_surface_form[sf_idx] = 0;
+            if (std::find(lex_.semantic_forms.begin(), lex_.semantic_forms.end(), *sem_node) == lex_.semantic_forms.end()){
+                lex_.semantic_forms.push_back(*sem_node);
+            }
+            int sem_idx = std::find(lex_.semantic_forms.begin(), lex_.semantic_forms.end(), *sem_node) - lex_.semantic_forms.begin();
+            if (sf_idx == lex_.entries.size()){
+                std::vector<int> blank;
+                lex_.entries.push_back(blank);
+            }
+            if (std::find(lex_.entries[sf_idx].begin(), lex_.entries[sf_idx].end(), sf_idx) == lex_.entries[sf_idx].end())
+                lex_.entries[sf_idx].push_back(sf_idx);
+            tuple2 key(lex_.semantic_forms[sem_idx]->category_, sf_idx);
+            if (_CCG_given_token_counts.find(key) == _CCG_given_token_counts.end())
+                _CCG_given_token_counts[key] = 1;
+            tuple2 key2(sf_idx, sem_idx);
+            if (_lexicon_entry_given_token_counts.find(key2) == _lexicon_entry_given_token_counts.end())
+                _lexicon_entry_given_token_counts[key2] = 1;
+        }
+        std::vector<ParseNode *> form_leaves = form.get_leaves();
+        for (int j = 0; j < form_leaves.size(); j++){ // there seems to be a check if surface form is string here which might mean we have inconsistency in ParseNode
+            form_leaves[j]->surface_form = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), form_leaves[j]->surface_form) - lex_.surface_forms.begin();
+        }
+
+        ParseNode form = z;
+        for (int j = 0; j < z_lex.size(); j += 2){
+            lex_entries surface_form = z_lex[j];
+            SemanticNode sem_node = z_lex[j+1];
+            if (surface_form.type() == typeid(std::string) && std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), surface_form) == lex_.surface_forms.end())
+                lex_.surface_forms.push_back(surface_form);
+            int sf_idx = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), surface_form) - lex_.surface_forms.begin();
+            if (_skipwords_given_surface_form.find(sf_idx) == _skipwords_given_surface_form.end())
+                _skipwords_given_surface_form[sf_idx] = 0;
+            if (std::find(lex_.semantic_forms.begin(), lex_.semantic_forms.end(), *sem_node) == lex_.semantic_forms.end()){
+                lex_.semantic_forms.push_back(*sem_node);
+            }
+            int sem_idx = std::find(lex_.semantic_forms.begin(), lex_.semantic_forms.end(), *sem_node) - lex_.semantic_forms.begin();
+            if (sf_idx == lex_.entries.size()){
+                std::vector<int> blank;
+                lex_.entries.push_back(blank);
+            }
+            if (std::find(lex_.entries[sf_idx].begin(), lex_.entries[sf_idx].end(), sf_idx) == lex_.entries[sf_idx].end())
+                lex_.entries[sf_idx].push_back(sf_idx);
+            tuple2 key(lex_.semantic_forms[sem_idx]->category_, sf_idx);
+            if (_CCG_given_token_counts.find(key) == _CCG_given_token_counts.end())
+                _CCG_given_token_counts[key] = 1;
+            tuple2 key2(sf_idx, sem_idx);
+            if (_lexicon_entry_given_token_counts.find(key2) == _lexicon_entry_given_token_counts.end())
+                _lexicon_entry_given_token_counts[key2] = 1;
+        }
+        std::vector<ParseNode *> form_leaves = form.get_leaves();
+        for (int j = 0; j < form_leaves.size(); j++){ // there seems to be a check if surface form is string here which might mean we have inconsistency in ParseNode
+            form_leaves[j]->surface_form = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), form_leaves[j]->surface_form) - lex_.surface_forms.begin();
+        }
+        // to implement calling functions
+
+
+    }
+
+    update_probabilities();
 }
 
 std::unordered_map<svTuple2, int> count_lexical_entries(ParseNode y){
