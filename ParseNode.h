@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "SemanticNode.h"
+#include <boost/variant.hpp>
 class ParseNode
 {
 public:
@@ -10,8 +11,8 @@ public:
     SemanticNode *node_;
     std::vector<ParseNode *> children_;
     std::vector<int> semantic_form_;
-    std::string surface_form_;
-    ParseNode(ParseNode *parent,  SemanticNode* node, std::vector<ParseNode *> children = {}, std::string surface_form  = std::string(""), std::vector<int> semantic_form = {});
+    boost::variant<std::string, int> surface_form_;
+    ParseNode(ParseNode *parent,  SemanticNode* node, std::vector<ParseNode *> children = {}, boost::variant<std::string, int> surface_form = "", std::vector<int> semantic_form = {});
     std::vector<ParseNode *> get_leaves();
 };
 

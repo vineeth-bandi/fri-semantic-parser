@@ -1,7 +1,7 @@
 
 #include "ParseNode.h"
 
-ParseNode::ParseNode(ParseNode *parent, SemanticNode *node, std::vector<ParseNode *> children, std::string surface_form, std::vector<int> semantic_form) : parent_(parent), node_(node), children_(children), surface_form_(surface_form), semantic_form_(semantic_form) {
+ParseNode::ParseNode(ParseNode *parent, SemanticNode *node, std::vector<ParseNode *> children, boost::variant<std::string, int> surface_form, std::vector<int> semantic_form) : parent_(parent), node_(node), children_(children), surface_form_(surface_form), semantic_form_(semantic_form) {
 
 }
 
