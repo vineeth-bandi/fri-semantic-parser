@@ -382,8 +382,9 @@ void update_learned_parameters(std::vector<boostT> t){
                 _lexicon_entry_given_token_counts[key2] = 1;
         }
         std::vector<ParseNode *> form_leaves = form.get_leaves();
-        for (int j = 0; j < form_leaves.size(); j++){ // there seems to be a check if surface form is string here which might mean we have inconsistency in ParseNode
-            form_leaves[j]->surface_form = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), form_leaves[j]->surface_form) - lex_.surface_forms.begin();
+        for (int j = 0; j < form_leaves.size(); j++){ 
+            if (form_leaves[j]->surface_form.type() == typeid(std::string))
+                form_leaves[j]->surface_form = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), form_leaves[j]->surface_form) - lex_.surface_forms.begin();
         }
 
         ParseNode form = z;
@@ -413,8 +414,9 @@ void update_learned_parameters(std::vector<boostT> t){
                 _lexicon_entry_given_token_counts[key2] = 1;
         }
         std::vector<ParseNode *> form_leaves = form.get_leaves();
-        for (int j = 0; j < form_leaves.size(); j++){ // there seems to be a check if surface form is string here which might mean we have inconsistency in ParseNode
-            form_leaves[j]->surface_form = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), form_leaves[j]->surface_form) - lex_.surface_forms.begin();
+        for (int j = 0; j < form_leaves.size(); j++){ 
+            if (form_leaves[j]->surface_form.type() == typeid(std::string))
+                form_leaves[j]->surface_form = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), form_leaves[j]->surface_form) - lex_.surface_forms.begin();
         }
 
         auto y_keys = count_ccg_surface_form_pairs(y);
@@ -571,7 +573,7 @@ std::unordered_map<svTuple2, int> count_lexical_entries(ParseNode y){
     std::unordered_map<svTuple2, int> pairs;
     std::vector<ParseNode *> token_assignments = y.get_leaves();
     for (int i = 0; i < token_assignments.size(); i++){
-        vvTuple2 key(token_assignments[i]->surface_form_, token_assignments[i]->semantic_form_);
+        svTuple2 key(token_assignments[i]->surface_form_, token_assignments[i]->semantic_form_);
         auto it = pairs.find(key);
         if (it == pairs.end()){
             pairs[key] = 0;
@@ -612,7 +614,7 @@ std::unordered_map<ivTuple2, int> count_ccg_surface_form_pairs(ParseNode y){
     std::unordered_map<ivTuple2, int> pairs;
     std::vector<ParseNode *> token_assignments = y.get_leaves();
     for (int i = 0; i < token_assignments.size(); i++){
-        vvTuple2 key(token_assignments[i]->category_, token_assignments[i]->surface_form_);
+        ivTuple2 key(token_assignments[i]->category_, token_assignments[i]->surface_form_);
         auto it = pairs.find(key);
         if (it == pairs.end()){
             pairs[key] = 0;
