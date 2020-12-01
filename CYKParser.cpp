@@ -1,5 +1,6 @@
 #include "CYKParser.h"
 #include <math.h>
+#include <limits.h>
 
 Parameters::Parameters(Ontology ont, Lexicon lex, bool allow_merge, bool use_language_model = false, double lexicon_weight = 1.0){
     ont_ = ont;
@@ -622,4 +623,160 @@ std::unordered_map<ivTuple2, int> count_ccg_surface_form_pairs(ParseNode y){
         pairs[key]++;
     }
     return pairs;
+}
+
+CYKParser::CYKParser(Ontology ont, Lexicon lex, bool use_language_model = false, double lexicon_weight = 1.0, bool perform_type_raising = true, bool allow_merge = true){
+    safety_ = true;
+
+    ont_ = ont;
+    lex_ = lex;
+    use_language_model_ = use_language_model;
+
+    type_raised_ = new std::unordered_map<int, int>();
+    if (perform_type_raising)
+        type_raise_bare_nouns();
+    
+    theta_ = new Parameters(ont, lex, allow_merge, use_language_model, lexicon_weight);
+
+    // additional linguistic information and parameters set in header
+    allow_merge_ = allow_merge;
+    cached_combinations_ = new std::unordered_map<ParseNode, std::unordered_map<ParseNode, ParseNode>>();
+    parsing_timeout_on_last_parse_ = false;
+}
+
+double CYKParser::get_language_model_score(ParseNode y) {
+    if (y == NULL)
+        return -INT_MAX;
+    
+    std::vector<int> t;
+    std::vector<ParseNode*> leaves = y.get_leaves();
+    for (int i = 0; i < leaves.size(); i++) {
+        if (leaves[i]->surface_form_.type() == typeid(std::string)) {
+            t.push_back(-1);
+        } else {
+            // else is int type, push it as is
+            t.push_back(leaves[i]->surface_form_);
+        }
+    }
+    
+    double score = 0;
+    t.insert(t.begin(), -2);
+    t.push_back(-3);
+    for (int t_idx = 0; t_idx < t.size() - 1; t_idx++) {
+        tuple2 key(t[t_idx], t[t_idx+1]);
+        auto it = theta.token_given_token.find(key);
+        score += (it != theta.token_given_token.end()) ? theta.token_given_token[key] : 0.0;
+    }
+    return score;
+}
+
+void CYKParser::type_raise_bare_nouns() {
+    // probably don't need some of the if statements
+    auto it = find(lex_.categories.begin(), lex_.categories.end(), "NP"); 
+    int noun_phrase_cat_idx;
+    if (it != lex_.categories.end()) { 
+        noun_phrase_cat_idx = it - lex_.categories.begin();
+    }
+    it = find(lex_.categories.begin(), lex_.categories.end(), "N"); 
+    int bare_noun_cat_idx;
+    if (it != lex_.categories.end()) { 
+        noun_phrase_cat_idx = it - lex_.categories.begin();;
+    }
+    // lex categories are vectors
+    std::vector<int> raised_cat{bare_noun_cat_idx, 1, bare_noun_cat_idx};
+    it = find(lex_.categories.begin(), lex_.categories.end(), raised_cat); 
+    int raised_cat_idx;
+    // If element wasn't found 
+    if (it == lex_.categories.end()) { 
+        lex_.categories.push_back(raised_cat);
+    }
+    it = find(lex_.categories.begin(), lex_.categories.end(), raised_cat); 
+    raised_cat_idx = it - lex_.categories.begin();
+    it = find(ont_.types_.begin(), ont_.types_.end(), "t"); 
+    int t_idx;
+    if (it != ont_.types_.end()) {
+        t_idx = it - ont_.types_.begin();
+    }
+
+    std::vector<std::tuple<int, int, SemanticNode>> to_add;
+
+    SemanticNode *sem;
+    for (int sf_idx = 0; sf_idx < lex_.surface_forms.size(); i++) {
+        for (int sem_idx : lex_.entries[sf_idx]) {
+            sem = lex_.semantic_forms[sem_idx];
+            if (sem->category_ == bare_noun_cat_idx && !sem->is_lambda_ && sem->children_ == NULL) {
+                int sem_type_idx = ont_.entries_[sem->idx_];
+                boost::variant<std::string, std::vector<int>> sem_type = ont_.types_[sem_type_idx];
+                if (sem_type.type() == typeid(std::vector<int>) && sem_type[1] == t_idx) {
+                    // ensure there isn't already a raised predicate matching this bare noun
+                    bool already_raised = false;
+                    SemanticNode *raised_sem = NULL;
+                    bool already_has_existential = false;
+                    int cons_type_idx = sem_type[0];
+                    int cons_a_idx;
+                    it = find(ont_.preds_.begin(), ont_.preds_.end(), "a_" + ont_.types_[cons_type_idx]); 
+                    if (it != ont_.preds_.end()) {
+                        cons_a_idx = it - ont_.preds_.begin();
+                    }
+                    for (int alt_idx : lex_.entries[sf_idx]) {
+                        SemanticNode *alt = lex_.semantic_forms[alt_idx];
+                        if (alt->category_ == raised_cat_idx && alt->is_lambda_ && alt->is_lambda_instantiation_ && alt->type_ == cons_a_idx && !alt->children_[0]->is_lambda_ &&
+                            ont_.entries_[alt->children_[0]->idx_] == sem_type_idx && !alt->children_[0]->children_[0]->is_lambda_instantiation_) {
+                            already_raised = true;
+                            // pointer dereference to semanticnode
+                            raised_sem = alt;
+                            // debug code here
+                        } else if (alt->category_ == noun_phrase_cat_idx && !alt->is_lambda_ && alt->type_ == ont_.entries_[cons_a_idx] && alt->children_[0]->category_ == raised_cat_idx &&
+                                    alt->children_[0]->is_lambda_ && alt->children_[0]->is_lambda_instantiation_ && alt->children_[0]->type_ == cons_type_idx && !alt->children_[0]->children_[0]->is_lambda_ &&
+                                    ont_.entries_[alt->children_[0]->children_[0]->idx_] == sem_type_idx && !alt->children_[0]->children_[0]->children_[0]->is_lambda_instantiation_) {
+                            already_has_existential = true;
+                            // debug code
+                        }
+
+                    }
+
+                    if (!already_raised) {
+                        // raised_sem = SemanticNode.SemanticNode(None, cons_type_idx, raised_cat_idx, True, lambda_name=0, is_lambda_instantiation=True)
+                        raised_sem = new SemanticNode(NULL, cons_type_idx, raised_cat_idx, 0, true, NULL);
+                        // deep copy?
+                        SemanticNode *raised_pred = new SemanticNode(sem);
+                        raised_pred->parent_ = raised_sem;
+                        // lambda_inst = SemanticNode.SemanticNode(raised_pred, cons_type_idx, bare_noun_cat_idx, True, lambda_name=0, is_lambda_instantiation=False)
+                        SemanticNode lambda_inst = new SemanticNode(raised_pred, cons_type_idx, bare_noun_cat_idx, 0, false, NULL);
+                        raised_pred->children_ = std::vector<SemanticNode*>{lambda_inst};
+                        raised_sem->children_ = std::vector<SemanticNode*>{raised_pred};
+                        std::tuple<int, int, SemanticNode*> element(sf_idx, sem_idx, raised_sem);
+                        to_add.push_back(element);
+                    }
+                    if (!already_has_existential) {
+                        //ex_sem = SemanticNode.SemanticNode(None, self.ontology.entries[cons_a_idx], noun_phrase_cat_idx, False, idx=cons_a_idx)
+                        std::vector<SemanticNode*> vect;
+                        // deep copy?
+                        vect.push_back(new SemanticNode(raised_sem));
+                        SemanticNode *ex_sem = new SemanticNode(NULL, ont_.entries_[cons_a_idx], noun_phrase_cat_idx, cons_a_idx, vect);
+                        ex_sem->children_[0]->parent_ = ex_sem;
+                        std::tuple<int, int, SemanticNode*> element2(sf_idx, INT_MIN, ex_sem);
+                        to_add.push_back(element2);
+                    }
+                }
+            }
+        }
+    }
+
+    for (std::tuple<int, int, SemanticNode*> i : to_add) {
+        // debug code here
+        if (safety_ && !sem->validate_tree_structure()) {
+            // sys exit error not valid
+            exit(0);
+        }
+        // sem is index 2 of tuple
+        lex_.semantic_forms.push_back(get<2>(i));
+        // sf_idx index 0 of tuple
+        lex_.entries[get<0>(i)].push_back(lex_.semantic_forms.size() - 1);
+        // sem_idx index 1 of tuple, using INT MIN instead of None
+        if (get<1>(i) != INT_MIN) {
+            type_raised_[get<1>(i)] = lex_.semantic_forms.size() - 1;
+        }
+    }
+
 }
