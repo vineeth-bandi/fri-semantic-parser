@@ -416,9 +416,152 @@ void update_learned_parameters(std::vector<boostT> t){
         for (int j = 0; j < form_leaves.size(); j++){ // there seems to be a check if surface form is string here which might mean we have inconsistency in ParseNode
             form_leaves[j]->surface_form = std::find(lex_.surface_forms.begin(), lex_.surface_forms.end(), form_leaves[j]->surface_form) - lex_.surface_forms.begin();
         }
-        // to implement calling functions
 
+        auto y_keys = count_ccg_surface_form_pairs(y);
+        auto z_keys = count_ccg_surface_form_pairs(z);
+        std::vector<ivTuple2> seen_keys;
+        for (int j = 0; j < z_keys.size(); j++){
+            z_val = z_keys[z_keys[j]];
+            if (std::find(y_keys.begin(), y_keys.end(), z_keys[j]) != y_keys.end()){
+                y_val = y_keys[z_keys[j]];
+                seen_keys.push_back(z_keys[j]);
+            }
+            else y_val = 0;
+            if (std::find(_CCG_given_token_counts.begin(), _CCG_given_token_counts.end(), z_keys[j]) == _CCG_given_token_counts.end())
+                _CCG_given_token_counts[z_keys[j]] = 0;
+            _CCG_given_token_counts[z_keys[j]] += lr * (z_val - y_val);
+        }
+        for (int j = 0; j < y_keys.size(); j++){
+            if (std::find(seen_keys.begin(), seen_keys.end(), y_keys[j]) != seen_keys.end())
+                continue;
+            y_val = y_keys[y_keys[j]];
+            z_val = 0;
+            if (std::find(_CCG_given_token_counts.begin(), _CCG_given_token_counts.end(), y_keys[j]) == _CCG_given_token_counts.end())
+                _CCG_given_token_counts[y_keys[j]] = 0;
+            _CCG_given_token_counts[y_keys[j]] += lr * (z_val - y_val);
+        }
 
+        y_keys = count_ccg_productions(y);
+        z_keys = count_ccg_productions(z);
+        std::vector<tuple3> seen_keys2;
+        for (int j = 0; j < z_keys.size(); j++){
+            z_val = z_keys[z_keys[j]];
+            if (std::find(y_keys.begin(), y_keys.end(), z_keys[j]) != y_keys.end()){
+                y_val = y_keys[z_keys[j]];
+                seen_keys2.push_back(z_keys[j]);
+            }
+            else y_val = 0;
+            if (std::find(_CCG_production_counts.begin(), _CCG_production_counts.end(), z_keys[j]) == _CCG_production_counts.end())
+                _CCG_production_counts[z_keys[j]] = 0;
+            _CCG_production_counts[z_keys[j]] += lr * (z_val - y_val);
+        }
+        for (int j = 0; j < y_keys.size(); j++){
+            if (std::find(seen_keys2.begin(), seen_keys2.end(), y_keys[j]) != seen_keys2.end())
+                continue;
+            y_val = y_keys[y_keys[j]];
+            z_val = 0;
+            if (std::find(_CCG_production_counts.begin(), _CCG_production_counts.end(), y_keys[j]) == _CCG_production_counts.end())
+                _CCG_production_counts[y_keys[j]] = 0;
+            _CCG_production_counts[y_keys[j]] += lr * (z_val - y_val);
+        }
+
+        y_keys = count_lexical_entries(y);
+        z_keys = count_lexical_entries(z);
+        std::vector<svTuple2> seen_keys3;
+        for (int j = 0; j < z_keys.size(); j++){
+            z_val = z_keys[z_keys[j]];
+            if (std::find(y_keys.begin(), y_keys.end(), z_keys[j]) != y_keys.end()){
+                y_val = y_keys[z_keys[j]];
+                seen_keys3.push_back(z_keys[j]);
+            }
+            else y_val = 0;
+            if (std::find(_lexicon_entry_given_token_counts.begin(), _lexicon_entry_given_token_counts.end(), z_keys[j]) == _lexicon_entry_given_token_counts.end())
+                _lexicon_entry_given_token_counts[z_keys[j]] = 0;
+            _lexicon_entry_given_token_counts[z_keys[j]] += lr * (z_val - y_val);
+        }
+        for (int j = 0; j < y_keys.size(); j++){
+            if (std::find(seen_keys3.begin(), seen_keys3.end(), y_keys[j]) != seen_keys3.end())
+                continue;
+            y_val = y_keys[y_keys[j]];
+            z_val = 0;
+            if (std::find(_lexicon_entry_given_token_counts.begin(), _lexicon_entry_given_token_counts.end(), y_keys[j]) == _lexicon_entry_given_token_counts.end())
+                _lexicon_entry_given_token_counts[y_keys[j]] = 0;
+            _lexicon_entry_given_token_counts[y_keys[j]] += lr * (z_val - y_val);
+        }
+
+        y_keys = count_semantics(y);
+        z_keys = count_semantics(z);
+        std::vector<ltuple3> seen_keys4;
+        for (int j = 0; j < z_keys.size(); j++){
+            z_val = z_keys[z_keys[j]];
+            if (std::find(y_keys.begin(), y_keys.end(), z_keys[j]) != y_keys.end()){
+                y_val = y_keys[z_keys[j]];
+                seen_keys4.push_back(z_keys[j]);
+            }
+            else y_val = 0;
+            if (std::find(_semantic_counts.begin(), _semantic_counts.end(), z_keys[j]) == _semantic_counts.end())
+                _semantic_counts[z_keys[j]] = 0;
+            _semantic_counts[z_keys[j]] += lr * (z_val - y_val);
+        }
+        for (int j = 0; j < y_keys.size(); j++){
+            if (std::find(seen_keys4.begin(), seen_keys4.end(), y_keys[j]) != seen_keys4.end())
+                continue;
+            y_val = y_keys[y_keys[j]];
+            z_val = 0;
+            if (std::find(_semantic_counts.begin(), _semantic_counts.end(), y_keys[j]) == _semantic_counts.end())
+                _semantic_counts[y_keys[j]] = 0;
+            _semantic_counts[y_keys[j]] += lr * (z_val - y_val);
+        }
+
+        y_keys = count_ccg_root(y);
+        z_keys = count_ccg_root(z);
+        std::vector<int> seen_keys5;
+        for (int j = 0; j < z_keys.size(); j++){
+            z_val = z_keys[z_keys[j]];
+            if (std::find(y_keys.begin(), y_keys.end(), z_keys[j]) != y_keys.end()){
+                y_val = y_keys[z_keys[j]];
+                seen_keys5.push_back(z_keys[j]);
+            }
+            else y_val = 0;
+            if (std::find(_CCG_root_counts.begin(), _CCG_root_counts.end(), z_keys[j]) == _CCG_root_counts.end())
+                _CCG_root_counts[z_keys[j]] = 0;
+            _CCG_root_counts[z_keys[j]] += lr * (z_val - y_val);
+        }
+        for (int j = 0; j < y_keys.size(); j++){
+            if (std::find(seen_keys5.begin(), seen_keys5.end(), y_keys[j]) != seen_keys5.end())
+                continue;
+            y_val = y_keys[y_keys[j]];
+            z_val = 0;
+            if (std::find(_CCG_root_counts.begin(), _CCG_root_counts.end(), y_keys[j]) == _CCG_root_counts.end())
+                _CCG_root_counts[y_keys[j]] = 0;
+            _CCG_root_counts[y_keys[j]] += lr * (z_val - y_val);
+        }
+
+        if (use_language_model){
+            y_keys = count_token_bigrams(y);
+            z_keys = count_token_bigrams(z);
+            std::vector<vvTuple2> seen_keys6;
+            for (int j = 0; j < z_keys.size(); j++){
+                z_val = z_keys[z_keys[j]];
+                if (std::find(y_keys.begin(), y_keys.end(), z_keys[j]) != y_keys.end()){
+                    y_val = y_keys[z_keys[j]];
+                    seen_keys6.push_back(z_keys[j]);
+                }
+                else y_val = 0;
+                if (std::find(_token_given_token_counts.begin(), _token_given_token_counts.end(), z_keys[j]) == _token_given_token_counts.end())
+                    _token_given_token_counts[z_keys[j]] = 0;
+                _token_given_token_counts[z_keys[j]] += lr * (z_val - y_val);
+            }
+            for (int j = 0; j < y_keys.size(); j++){
+                if (std::find(seen_keys6.begin(), seen_keys6.end(), y_keys[j]) != seen_keys6.end())
+                    continue;
+                y_val = y_keys[y_keys[j]];
+                z_val = 0;
+                if (std::find(_token_given_token_counts.begin(), _token_given_token_counts.end(), y_keys[j]) == _token_given_token_counts.end())
+                    _token_given_token_counts[y_keys[j]] = 0;
+                _token_given_token_counts[y_keys[j]] += lr * (z_val - y_val);
+            }
+        }
     }
 
     update_probabilities();
